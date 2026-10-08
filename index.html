@@ -1,0 +1,2872 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Guia de estudo de Python com lições, referência de funções e exercícios de lógica com correção automática no navegador.">
+<title>Caderno de Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: caderno quadriculado — barra lateral com a trilha da ETEC + folha central com uma lição por vez */
+:root {
+  --bg: #f3f6f9;
+  --grid: rgba(43, 95, 143, .055);
+  --paper: #ffffff;
+  --ink: #142231;
+  --muted: #586a7d;
+  --line: #d9e1ea;
+  --accent: #2b5f8f;
+  --accent-soft: #e3edf6;
+  --marker: #ffd94a;
+  --marker-ink: #3a2f00;
+  --ok: #1d7f49;
+  --ok-soft: #e1f3e8;
+  --err: #b8322a;
+  --err-soft: #fbe6e4;
+  --code-bg: #0f1b28;
+  --code-fg: #dfe8f1;
+  --code-line: #22344a;
+  --tk-kw: #ffd94a;
+  --tk-str: #9fe0a8;
+  --tk-num: #f5a97f;
+  --tk-com: #7f93a8;
+  --tk-fn: #8cc6ff;
+  --tk-bi: #d7a8ff;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c131b; --grid: rgba(127, 178, 229, .045); --paper: #121c27; --ink: #e3eaf2; --muted: #95a6b8;
+    --line: #22313f; --accent: #82b6ea; --accent-soft: #1a2a3b; --marker: #f5cf3c; --marker-ink: #2a2200;
+    --ok: #5fcf8e; --ok-soft: #12291c; --err: #f08378; --err-soft: #2e1714;
+    --code-bg: #0a1118; --code-line: #1d2c3c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c131b; --grid: rgba(127, 178, 229, .045); --paper: #121c27; --ink: #e3eaf2; --muted: #95a6b8;
+  --line: #22313f; --accent: #82b6ea; --accent-soft: #1a2a3b; --marker: #f5cf3c; --marker-ink: #2a2200;
+  --ok: #5fcf8e; --ok-soft: #12291c; --err: #f08378; --err-soft: #2e1714;
+  --code-bg: #0a1118; --code-line: #1d2c3c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 72px; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 17px/1.6 var(--f-body);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--marker); outline-offset: 2px; border-radius: 4px; }
+code, kbd { font-family: var(--f-mono); font-size: .86em; background: var(--accent-soft); padding: .08em .35em; border-radius: 4px; }
+mark { background: linear-gradient(transparent 45%, var(--marker) 45%); color: inherit; padding: 0 .1em; }
+h1, h2, h3, h4 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -.02em; }
+h2 { font-size: 1.6rem; font-weight: 700; margin-top: 2.2rem; }
+h3 { font-size: 1.2rem; font-weight: 700; margin-top: 1.6rem; }
+p, ul, ol { margin: .7rem 0; }
+li { margin: .25rem 0; }
+
+/* ---------- topo ---------- */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px; background: var(--paper); border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); }
+.brand b { font: 800 1.25rem var(--f-display); letter-spacing: -.01em; }
+.brand span { font: 600 .8rem var(--f-mono); color: var(--accent); }
+.topbar .spacer { flex: 1; }
+.pystatus { font: 600 .75rem var(--f-mono); padding: 4px 10px; border-radius: 99px; background: var(--accent-soft); color: var(--muted); white-space: nowrap; }
+.pystatus.ok { background: var(--ok-soft); color: var(--ok); }
+.pystatus.bad { background: var(--err-soft); color: var(--err); }
+.iconbtn { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 6px 10px; font: 600 .85rem var(--f-body); cursor: pointer; }
+.iconbtn:hover { border-color: var(--accent); }
+#menuBtn { display: none; }
+
+/* ---------- estrutura ---------- */
+.shell { display: grid; grid-template-columns: 270px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+.sidebar {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 53px); align-self: start;
+  height: calc(100vh - 53px); overflow-y: auto; padding: 18px 12px 40px 16px; border-right: 1px solid var(--line);
+}
+.navgroup { margin-bottom: 18px; }
+.navgroup h4 { font: 700 .72rem var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--muted); margin: 0 0 6px 8px; }
+.sidebar a.nav {
+  display: flex; gap: 8px; align-items: baseline; padding: 5px 8px; border-radius: 7px;
+  color: var(--ink); text-decoration: none; font-size: .95rem; line-height: 1.35;
+}
+.sidebar a.nav .n { font: 600 .72rem var(--f-mono); color: var(--muted); min-width: 1.6em; }
+.sidebar a.nav:hover { background: var(--accent-soft); }
+.sidebar a.nav.active { background: var(--accent); color: var(--paper); }
+.sidebar a.nav.active .n { color: var(--paper); opacity: .8; }
+
+main { min-width: 0; padding-block: 28px 80px; padding-inline: 32px; }
+.page { max-width: 860px; margin: 0 auto; }
+.page[hidden] { display: none !important; }
+.eyebrow { font: 700 .75rem var(--f-mono); color: var(--accent); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+.lead { font-size: 1.12rem; color: var(--muted); max-width: 62ch; }
+.page > p, .page > ul, .page > ol { max-width: 68ch; }
+.pager { max-width: 860px; margin-inline: auto; display: flex; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 18px; border-top: 1px dashed var(--line); flex-wrap: wrap; }
+.pager a { text-decoration: none; font-weight: 700; }
+
+/* ---------- blocos ---------- */
+.note { border: 1px solid var(--line); background: var(--paper); border-radius: var(--r); padding: 12px 16px; margin: 1rem 0; }
+.note.tip { border-left: 4px solid var(--marker); }
+.note.warn { border-left: 4px solid var(--err); }
+.note > :first-child { margin-top: 0; } .note > :last-child { margin-bottom: 0; }
+.tablewrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--paper); }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 700 .74rem var(--f-body); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+td code { white-space: nowrap; }
+
+/* ---------- código ---------- */
+.codebox { margin: 1rem 0; border-radius: var(--r); overflow: hidden; background: var(--code-bg); border: 1px solid var(--code-line); }
+.codebox .bar { display: flex; gap: 6px; align-items: center; padding: 6px 8px 6px 14px; border-bottom: 1px solid var(--code-line); flex-wrap: wrap; }
+.codebox .bar .lbl { font: 600 .7rem var(--f-mono); color: var(--tk-com); letter-spacing: .06em; text-transform: uppercase; flex: 1; }
+.codebox .bar button { font: 600 .75rem var(--f-mono); background: transparent; color: var(--code-fg); border: 1px solid var(--code-line); border-radius: 6px; padding: 4px 9px; cursor: pointer; }
+.codebox .bar button:hover { border-color: var(--tk-fn); }
+.codebox .bar button.run { background: var(--marker); color: #2a2200; border-color: var(--marker); }
+pre.code { margin: 0; padding: 14px 16px; overflow-x: auto; color: var(--code-fg); font: 400 .88rem/1.65 var(--f-mono); tab-size: 4; background: var(--code-bg); }
+.tk-kw { color: var(--tk-kw); font-weight: 600; } .tk-str { color: var(--tk-str); } .tk-num { color: var(--tk-num); }
+.tk-com { color: var(--tk-com); font-style: italic; } .tk-fn { color: var(--tk-fn); } .tk-bi { color: var(--tk-bi); }
+.out { margin: 0; padding: 12px 16px; border-top: 1px dashed var(--code-line); font: .86rem/1.55 var(--f-mono); color: var(--code-fg); white-space: pre-wrap; word-break: break-word; background: #0b141e; }
+.out .errline { color: #ff9c92; }
+.out .hint { color: var(--marker); display: block; margin-top: 6px; font-family: var(--f-body); font-size: .92rem; }
+.out .muted { color: var(--tk-com); }
+
+/* ---------- editor ---------- */
+.editor { width: 100%; min-height: 220px; resize: vertical; display: block; border: 0; outline: none; padding: 14px 16px; background: var(--code-bg); color: var(--code-fg); font: .9rem/1.65 var(--f-mono); tab-size: 4; white-space: pre; overflow-wrap: normal; overflow-x: auto; }
+.editor:focus-visible { box-shadow: inset 0 0 0 2px var(--marker); outline: none; }
+.stdin { width: 100%; min-height: 64px; resize: vertical; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--paper); color: var(--ink); font: .86rem/1.5 var(--f-mono); }
+label.small { display: block; font: 700 .74rem var(--f-body); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 12px 0 4px; }
+.btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.btn { font: 700 .9rem var(--f-body); border-radius: 8px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+.btn.go { background: var(--marker); color: var(--marker-ink); border-color: var(--marker); }
+.btn:disabled { opacity: .55; cursor: wait; }
+
+/* ---------- home ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: center; margin-bottom: 10px; }
+.repl { background: var(--code-bg); color: var(--code-fg); border-radius: 12px; padding: 16px 18px; font: .9rem/1.7 var(--f-mono); border: 1px solid var(--code-line); overflow-x: auto; }
+.repl .p { color: var(--tk-kw); } .repl .r { color: var(--tk-str); }
+.trail { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 18px 0; }
+.trail a { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; padding: 14px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); text-decoration: none; color: var(--ink); }
+.trail a:hover { border-color: var(--accent); }
+.trail .n { grid-row: span 2; font: 800 1.5rem var(--f-display); color: var(--accent); line-height: 1; }
+.trail b { font-family: var(--f-display); }
+.trail small { color: var(--muted); font-size: .85rem; line-height: 1.35; }
+.progress { height: 10px; background: var(--accent-soft); border-radius: 99px; overflow: hidden; }
+.progress > i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .4s; }
+
+/* ---------- referência ---------- */
+.search { width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); color: var(--ink); font: 1rem var(--f-body); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.chip { font: 600 .82rem var(--f-body); border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 99px; padding: 4px 12px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.ref td:first-child code { color: var(--accent); font-weight: 600; background: none; padding: 0; }
+.ref td.ex code { white-space: pre; display: block; background: none; padding: 0; color: var(--muted); }
+.count { font: .8rem var(--f-mono); color: var(--muted); }
+
+/* ---------- exercícios ---------- */
+.exlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; margin-top: 12px; }
+.excard { display: grid; gap: 6px; text-align: left; padding: 12px 14px; border: 1px solid var(--line); background: var(--paper); border-radius: var(--r); cursor: pointer; color: var(--ink); font: inherit; }
+.excard:hover { border-color: var(--accent); }
+.excard .top { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.excard b { font: 700 1rem var(--f-display); line-height: 1.25; }
+.excard small { color: var(--muted); font-size: .85rem; line-height: 1.35; }
+.tag { font: 700 .68rem var(--f-mono); padding: 2px 7px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); text-transform: uppercase; letter-spacing: .04em; }
+.tag.done { background: var(--ok-soft); color: var(--ok); }
+.tag.lv1 { background: var(--ok-soft); color: var(--ok); }
+.tag.lv2 { background: var(--accent-soft); color: var(--accent); }
+.tag.lv3 { background: var(--err-soft); color: var(--err); }
+.exhead { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+.statement { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 18px; margin: 14px 0; }
+.statement > :first-child { margin-top: 0; } .statement > :last-child { margin-bottom: 0; }
+.results { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 6px; }
+.results li { margin: 0; padding: 8px 12px; border-radius: 8px; font: .85rem/1.5 var(--f-mono); word-break: break-word; }
+.results li.pass { background: var(--ok-soft); color: var(--ok); }
+.results li.fail { background: var(--err-soft); color: var(--err); }
+.banner { padding: 10px 14px; border-radius: 9px; font-weight: 700; margin: 10px 0; }
+.banner.ok { background: var(--ok-soft); color: var(--ok); }
+.banner.bad { background: var(--err-soft); color: var(--err); }
+details.reveal { margin: 10px 0; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); }
+details.reveal summary { cursor: pointer; padding: 9px 14px; font-weight: 700; }
+details.reveal > div { padding: 0 14px 12px; }
+details.reveal .codebox { margin-top: 4px; }
+
+/* ---------- lista ETEC ---------- */
+.etec-item { display: grid; grid-template-columns: 3.2em minmax(0, 1fr) auto; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.etec-item .num { font: 700 .95rem var(--f-mono); color: var(--accent); padding-top: 1px; }
+.etec-item p { margin: 0; max-width: none; }
+.etec-item .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.etec-item .acts button { font: 600 .78rem var(--f-body); padding: 4px 10px; border-radius: 7px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; white-space: nowrap; }
+.etec-item .acts button.g { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.etec-item .acts button:hover { border-color: var(--accent); }
+
+/* ---------- teste de mesa ---------- */
+.mesa input { width: 7em; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font: .9rem var(--f-mono); }
+.mesa input.right { border-color: var(--ok); background: var(--ok-soft); }
+.mesa input.wrong { border-color: var(--err); background: var(--err-soft); }
+
+@media (max-width: 920px) {
+  #menuBtn { display: inline-block; }
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { display: none; position: fixed; inset: 53px 0 0 0; height: auto; z-index: 15; background: var(--paper); border-right: 0; padding-bottom: 60px; }
+  body.nav-open .sidebar { display: block; }
+  main { padding-inline: 16px; }
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .etec-item { grid-template-columns: 2.6em minmax(0, 1fr); }
+  .etec-item .acts { grid-column: 2; justify-content: flex-start; }
+}
+@media (max-width: 520px) { .pystatus { display: none; } body { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+</head>
+<body>
+
+<header class="topbar">
+  <button class="iconbtn" id="menuBtn" type="button" aria-expanded="false" aria-controls="sidebar">Menu</button>
+  <a class="brand" href="#inicio"><b>Caderno de Python</b><span>&gt;&gt;&gt;</span></a>
+  <div class="spacer"></div>
+  <span class="pystatus" id="pyStatus" title="O Python roda dentro do navegador">Python: carregando…</span>
+  <button class="iconbtn" id="themeBtn" type="button" title="Alternar tema claro/escuro">Tema</button>
+</header>
+
+<div class="shell">
+<nav class="sidebar" id="sidebar" aria-label="Conteúdo"></nav>
+<main id="main">
+
+<!-- ===================== INÍCIO ===================== -->
+<section class="page" id="p-inicio" data-title="Início">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Programação e Algoritmos · ETEC</div>
+      <h1>Aprenda Python escrevendo Python.</h1>
+      <p class="lead">Um caderno de estudo que segue a mesma ordem da matéria: de algoritmo em português até vetores, registros e funções. Todo exemplo roda aqui mesmo, no navegador, sem instalar nada.</p>
+      <div class="btnrow">
+        <a class="btn primary" href="#logica" style="text-decoration:none">Começar pela lição 1</a>
+        <a class="btn go" href="#exercicios" style="text-decoration:none">Ir para os exercícios</a>
+      </div>
+    </div>
+<div class="repl" aria-label="Exemplo de sessão Python"><span class="p">&gt;&gt;&gt;</span> nota = 7.5
+<span class="p">&gt;&gt;&gt;</span> if nota &gt;= 7:
+<span class="p">...</span>     print("Aprovado")
+<span class="r">Aprovado</span>
+<span class="p">&gt;&gt;&gt;</span> 1352 % 10
+<span class="r">2</span>
+<span class="p">&gt;&gt;&gt;</span> 1352 // 10 % 10
+<span class="r">5</span></div>
+  </div>
+
+  <h2>Seu progresso</h2>
+  <p id="progressText">Nenhum exercício resolvido ainda.</p>
+  <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+  <h2>A trilha</h2>
+  <p>As lições seguem os capítulos da sua lista de exercícios. Faça na ordem: cada uma usa o que veio antes.</p>
+  <div class="trail" id="trail"></div>
+
+  <h2>Como usar este caderno</h2>
+  <ul>
+    <li><b>Rodar</b> executa o exemplo e mostra a saída logo abaixo. Mude o código no <a href="#playground">Playground</a> para testar suas ideias.</li>
+    <li>Quando o programa usa <code>input()</code>, os valores "digitados" vêm da caixa <b>Entrada</b>, uma linha por <code>input()</code>.</li>
+    <li>Nos <a href="#exercicios">exercícios</a>, o botão <b>Verificar</b> testa sua resposta com vários casos e marca o exercício como resolvido.</li>
+  </ul>
+  <div class="note tip">
+    <p><b>Para rodar no seu computador:</b> instale o Python em <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org/downloads</a> (no Windows, marque <i>Add Python to PATH</i>). Salve o código num arquivo <code>programa.py</code> e rode com <code>python programa.py</code> no terminal, ou use o IDLE, o VS Code ou o Thonny.</p>
+  </div>
+</section>
+
+<!-- ===================== 1. LÓGICA ===================== -->
+<section class="page" id="p-logica" data-title="Algoritmos e lógica" hidden>
+  <div class="eyebrow">Lição 1 · Algoritmos em linguagem natural</div>
+  <h1>Do algoritmo em português ao Python</h1>
+  <p class="lead">Um algoritmo é uma sequência finita de passos claros que resolve um problema. Programar é escrever esses passos numa língua que o computador entende.</p>
+
+  <h2>Os três blocos de todo programa</h2>
+  <p>Quase todo exercício da lista tem o mesmo esqueleto: <mark>entrada → processamento → saída</mark>. Antes de escrever código, separe essas três partes.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Parte</th><th>Pergunta</th><th>Exemplo: média de 3 notas</th></tr>
+    <tr><td>Entrada</td><td>Quais dados eu preciso receber?</td><td>nota1, nota2, nota3</td></tr>
+    <tr><td>Processamento</td><td>Que conta ou decisão eu faço com eles?</td><td>media = (nota1 + nota2 + nota3) / 3</td></tr>
+    <tr><td>Saída</td><td>O que eu mostro no final?</td><td>a média</td></tr>
+  </table></div>
+  <pre class="code" data-stdin="7|8.5|6">nota1 = float(input("Nota 1: "))   # entrada
+nota2 = float(input("Nota 2: "))
+nota3 = float(input("Nota 3: "))
+
+media = (nota1 + nota2 + nota3) / 3  # processamento
+
+print("Média:", round(media, 2))   # saída</pre>
+
+  <h2>Tradutor Portugol → Python</h2>
+  <p>Na aula você escreve pseudocódigo (Portugol). Esta tabela mostra o equivalente de cada comando. Guarde ela: é a ponte entre a lista e o Python.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Portugol</th><th>Python</th><th>Observação</th></tr>
+    <tr><td><code>inteiro: X</code></td><td><code>x = 0</code></td><td>Python não declara tipo; ele vem do valor</td></tr>
+    <tr><td><code>real</code> / <code>caractere</code> / <code>lógico</code></td><td><code>float</code> / <code>str</code> / <code>bool</code></td><td>lógico: <code>True</code> e <code>False</code></td></tr>
+    <tr><td><code>X ← 5</code></td><td><code>x = 5</code></td><td>atribuição usa um só <code>=</code></td></tr>
+    <tr><td><code>leia(X)</code></td><td><code>x = int(input())</code></td><td><code>input()</code> devolve texto; converta</td></tr>
+    <tr><td><code>escreva(X)</code></td><td><code>print(x)</code></td><td></td></tr>
+    <tr><td><code>X MOD 2</code></td><td><code>x % 2</code></td><td>resto da divisão</td></tr>
+    <tr><td><code>X DIV 2</code></td><td><code>x // 2</code></td><td>divisão inteira</td></tr>
+    <tr><td><code>X ** 3</code></td><td><code>x ** 3</code></td><td>potência (igual!)</td></tr>
+    <tr><td><code>=</code> (comparar), <code>&lt;&gt;</code></td><td><code>==</code>, <code>!=</code></td><td></td></tr>
+    <tr><td><code>E</code>, <code>OU</code>, <code>NÃO</code>, <code>XOU</code></td><td><code>and</code>, <code>or</code>, <code>not</code>, <code>!=</code></td><td>XOU entre lógicos é "diferente"</td></tr>
+    <tr><td><code>se … então … senão … fim_se</code></td><td><code>if …:</code> / <code>else:</code></td><td>o bloco é marcado pela indentação</td></tr>
+    <tr><td><code>senão se</code></td><td><code>elif</code></td><td></td></tr>
+    <tr><td><code>escolha (X) caso 1: …</code></td><td><code>match x:</code> / <code>case 1:</code></td><td>ou uma cadeia de <code>elif</code></td></tr>
+    <tr><td><code>enquanto … faça</code></td><td><code>while …:</code></td><td></td></tr>
+    <tr><td><code>para I de 1 até 10 faça</code></td><td><code>for i in range(1, 11):</code></td><td>o fim do <code>range</code> não entra</td></tr>
+    <tr><td><code>repita … até (cond)</code></td><td><code>while True:</code> … <code>if cond: break</code></td><td>Python não tem repita</td></tr>
+    <tr><td><code>vetor[1..10] de inteiro</code></td><td><code>v = [0] * 10</code></td><td>índices começam em <b>0</b></td></tr>
+    <tr><td><code>matriz[1..3,1..3]</code></td><td><code>m = [[0]*3 for _ in range(3)]</code></td><td><code>m[i][j]</code></td></tr>
+    <tr><td><code>registro</code></td><td><code>dict</code> ou <code>class</code></td><td><code>aluno["nome"]</code></td></tr>
+    <tr><td><code>procedimento</code> / <code>função</code></td><td><code>def nome(...):</code></td><td>função usa <code>return</code></td></tr>
+  </table></div>
+
+  <h3>Exemplo lado a lado</h3>
+  <p>Exercício 31 da lista: dizer se um número é positivo, negativo ou zero.</p>
+<pre class="code" data-run="no">início
+  inteiro: NUM
+  leia(NUM)
+  se (NUM &gt; 0) então
+     QUALE ← "NÚMERO POSITIVO"
+  senão
+     se (NUM &lt; 0) então
+        QUALE ← "NÚMERO NEGATIVO"
+     senão
+        QUALE ← "ZERO"
+  escreva(QUALE)
+fim</pre>
+  <pre class="code" data-stdin="-2">num = int(input("Número: "))
+if num &gt; 0:
+    quale = "NÚMERO POSITIVO"
+elif num &lt; 0:
+    quale = "NÚMERO NEGATIVO"
+else:
+    quale = "ZERO"
+print(quale)</pre>
+
+  <h2>Pensar antes de codar</h2>
+  <ol>
+    <li><b>Entenda o problema.</b> Reescreva com suas palavras. Quais são as entradas e a saída?</li>
+    <li><b>Resolva um caso no papel.</b> Com números de verdade: se o salário é 1000 e o aumento 22%, o resultado é 1220.</li>
+    <li><b>Escreva os passos em português.</b> Do jeito do exercício 8 (o robô MANNY): instruções pequenas, sem pular nada.</li>
+    <li><b>Traduza para Python</b> usando a tabela acima.</li>
+    <li><b>Teste com casos diferentes</b>, inclusive os chatos: zero, negativo, lista vazia, empate.</li>
+  </ol>
+  <div class="note tip"><p>Os exercícios 1 a 11 (banho, pneu, lâmpada, travessia do rio, Torre de Hanói) treinam justamente o passo 3. Não pule: quem escreve bons passos em português escreve bons programas.</p></div>
+  <p>A Torre de Hanói (exercício 10) tem uma solução famosa em Python. Rode e veja os movimentos para 3 discos:</p>
+  <pre class="code">def hanoi(n, origem, destino, auxiliar):
+    if n == 1:
+        print(f"Mova o disco 1 de {origem} para {destino}")
+        return
+    hanoi(n - 1, origem, auxiliar, destino)
+    print(f"Mova o disco {n} de {origem} para {destino}")
+    hanoi(n - 1, auxiliar, destino, origem)
+
+hanoi(3, "A", "C", "B")</pre>
+</section>
+
+<!-- ===================== 2. TIPOS ===================== -->
+<section class="page" id="p-tipos" data-title="Tipos e variáveis" hidden>
+  <div class="eyebrow">Lição 2 · Operadores e tipos (parte 1)</div>
+  <h1>Variáveis e tipos de dados</h1>
+  <p class="lead">Uma variável é um nome que guarda um valor. Em Python você não declara o tipo: ele é descoberto pelo valor que você coloca.</p>
+
+  <h2>Os tipos básicos</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Portugol</th><th>Python</th><th>Exemplos</th><th>Uso</th></tr>
+    <tr><td>inteiro</td><td><code>int</code></td><td><code>-5</code>, <code>0</code>, <code>3257</code></td><td>contagens, idade, matrícula</td></tr>
+    <tr><td>real</td><td><code>float</code></td><td><code>0.21</code>, <code>-0.001</code>, <code>2.0</code></td><td>notas, preços, alturas (use <b>ponto</b>, não vírgula)</td></tr>
+    <tr><td>caractere</td><td><code>str</code></td><td><code>"José"</code>, <code>"a"</code>, <code>"+3257"</code></td><td>nomes, textos, códigos</td></tr>
+    <tr><td>lógico</td><td><code>bool</code></td><td><code>True</code>, <code>False</code></td><td>condições, flags</td></tr>
+    <tr><td>—</td><td><code>NoneType</code></td><td><code>None</code></td><td>"nenhum valor ainda"</td></tr>
+  </table></div>
+  <pre class="code">nb = 8.5          # nota do aluno  -> float
+na = "Maria"      # nome do aluno  -> str
+nmat = 20241532   # matrícula      -> int
+sx = "F"          # sexo           -> str
+aprovado = nb &gt;= 7  # resultado de comparação -> bool
+
+print(type(nb), type(na), type(nmat), type(sx), type(aprovado))</pre>
+  <div class="note warn"><p><b>Pegadinha do exercício 16:</b> <code>"+3257"</code> com aspas é texto, não número. <code>0,35</code> com vírgula não é um número em Python (vira uma tupla!). <code>R$ 50,00</code> e <code>1%</code> não têm tipo definido: precisam ser convertidos.</p></div>
+
+  <h2>Regras para nomes (identificadores)</h2>
+  <p>Exercício 17. Um nome válido:</p>
+  <ul>
+    <li>começa com letra ou <code>_</code> (nunca com número): <code>b248</code> ✔, <code>3x4</code> ✘</li>
+    <li>tem só letras, números e <code>_</code>: <code>nota*do*aluno</code> ✘, <code>km/h</code> ✘, <code>ah!</code> ✘</li>
+    <li>não tem espaço: <code>nome empresa</code> ✘ → use <code>nome_empresa</code></li>
+    <li>não é palavra reservada (<code>if</code>, <code>for</code>, <code>class</code>…) e diferencia maiúsculas: <code>Maria</code> ≠ <code>maria</code></li>
+  </ul>
+  <p>Convenção em Python: <code>snake_case</code>, tudo minúsculo com <code>_</code>: <code>salario_liquido</code>, <code>total_vendas</code>.</p>
+
+  <h2>Conversão entre tipos</h2>
+  <p><code>input()</code> sempre devolve texto. Para fazer contas, converta:</p>
+  <pre class="code">print(int("42") + 1)       # 43
+print(float("7.5") * 2)    # 15.0
+print(str(10) + " anos")   # '10 anos'
+print(int(9.99))           # 9  (corta, não arredonda)
+print(round(9.99))         # 10
+print(bool(0), bool(5), bool(""), bool("oi"))  # False True False True
+print("5" + "5", 5 + 5)    # 55 10  (texto junta, número soma)</pre>
+
+  <h2>Atribuição múltipla e troca</h2>
+  <p>Os exercícios 41 e 57 pedem para trocar o conteúdo de A e B. No Portugol você usa uma variável auxiliar. Em Python dá para fazer dos dois jeitos:</p>
+  <pre class="code">a, b = 10, 20
+
+aux = a      # jeito clássico, com auxiliar
+a = b
+b = aux
+print(a, b)  # 20 10
+
+a, b = b, a  # jeito Python, troca direta
+print(a, b)  # 10 20</pre>
+</section>
+
+<!-- ===================== 3. OPERADORES ===================== -->
+<section class="page" id="p-operadores" data-title="Operadores e expressões" hidden>
+  <div class="eyebrow">Lição 3 · Operadores e tipos (parte 2)</div>
+  <h1>Operadores e expressões</h1>
+
+  <h2>Aritméticos</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Operador</th><th>Nome</th><th>Exemplo</th><th>Resultado</th></tr>
+    <tr><td><code>+</code></td><td>soma</td><td><code>7 + 2</code></td><td>9</td></tr>
+    <tr><td><code>-</code></td><td>subtração</td><td><code>7 - 2</code></td><td>5</td></tr>
+    <tr><td><code>*</code></td><td>multiplicação</td><td><code>7 * 2</code></td><td>14</td></tr>
+    <tr><td><code>/</code></td><td>divisão (sempre real)</td><td><code>7 / 2</code></td><td>3.5</td></tr>
+    <tr><td><code>//</code></td><td>divisão inteira (DIV)</td><td><code>7 // 2</code></td><td>3</td></tr>
+    <tr><td><code>%</code></td><td>resto (MOD)</td><td><code>7 % 2</code></td><td>1</td></tr>
+    <tr><td><code>**</code></td><td>potência</td><td><code>7 ** 2</code></td><td>49</td></tr>
+  </table></div>
+  <p><code>%</code> e <code>//</code> aparecem o tempo todo: <code>n % 2 == 0</code> testa se é par; <code>n % 10</code> pega o último dígito; <code>n // 10</code> tira o último dígito.</p>
+
+  <h2>Precedência (quem vem primeiro)</h2>
+  <ol>
+    <li><code>( )</code> parênteses</li>
+    <li><code>**</code> potência</li>
+    <li><code>-x</code> sinal negativo</li>
+    <li><code>*</code> <code>/</code> <code>//</code> <code>%</code> (da esquerda para a direita)</li>
+    <li><code>+</code> <code>-</code></li>
+    <li>comparações <code>== != &lt; &lt;= &gt; &gt;=</code></li>
+    <li><code>not</code>, depois <code>and</code>, depois <code>or</code></li>
+  </ol>
+  <p>Exercício 18: os pares dão o mesmo resultado? Tente responder antes de rodar.</p>
+  <pre class="code">print((4/2)+(2/4), 4/2+2/4, (4/2)+(2/4) == 4/2+2/4)
+print(4/(2+2)/4,   4/2+2/4, 4/(2+2)/4 == 4/2+2/4)
+print((4+2)*2-4,   4+2*2-4, (4+2)*2-4 == 4+2*2-4)</pre>
+  <p>Exercício 19 (tirar parênteses sem mudar o resultado): se a resposta estiver certa, as duas contas dão igual.</p>
+  <pre class="code">print(6*(3+2), "=", 6*(3+2))                  # a) não dá para tirar
+print((6/3)+(8/2), "=", 6/3+8/2)              # b)
+print(((3+(8/2))*4)+(3*2), "=", (3+8/2)*4+3*2)  # d)
+print((((10*8)+3)*9), "=", (10*8+3)*9)        # h)</pre>
+
+  <h2>Comparação e lógica</h2>
+  <p>Comparações devolvem <code>True</code> ou <code>False</code>. Combine com <code>and</code> (E), <code>or</code> (OU), <code>not</code> (NÃO).</p>
+  <div class="tablewrap"><table>
+    <tr><th>A</th><th>B</th><th>A and B</th><th>A or B</th><th>not A</th><th>A != B (XOU)</th></tr>
+    <tr><td>True</td><td>True</td><td>True</td><td>True</td><td>False</td><td>False</td></tr>
+    <tr><td>True</td><td>False</td><td>False</td><td>True</td><td>False</td><td>True</td></tr>
+    <tr><td>False</td><td>True</td><td>False</td><td>True</td><td>True</td><td>True</td></tr>
+    <tr><td>False</td><td>False</td><td>False</td><td>False</td><td>True</td><td>False</td></tr>
+  </table></div>
+  <p>Exercícios 20b, 21, 23 e 24 traduzidos. Escreva sua resposta no caderno e depois confira rodando:</p>
+  <pre class="code">A, B, C = 1, 2, 3
+X, Y, Z = 2.0, 10.0, -1.0
+L1, L2 = True, False
+NOME, RUA = "PEDRO", "PEDRINHO"
+
+print("20b a)", A + C / B)
+print("20b c)", C / B / A)
+print("20b e)", (-X) ** C)
+print("20b f)", NOME + RUA)
+print("20b g)", NOME == RUA)
+print("20b k)", (L1 and not L2) or (L2 and not L1))
+print("20b l)", X == Y and C == B)</pre>
+  <pre class="code">A, B, C = True, True, False
+print("21 a)", (A and B) or (A != B))
+print("21 b)", (A or B) and (A and C))
+print("21 c)", A or (C and B) != (A and not B))
+
+A, B, C = 3, 7, 4
+print("23:", (A+C) &gt; B, B &gt;= (A+2), C == (B-A), (B+A) &lt;= C, (C+A) &gt; B)
+
+A, B, C, D = 5, 4, 3, 6
+print("24:", (A &gt; C) and (C &lt;= D), (A+B) &gt; D or (A+B) == (C+D), (A &gt;= C) and (D &gt;= C))</pre>
+
+  <h2>Atribuição composta</h2>
+  <pre class="code">total = 10
+total += 5    # total = total + 5  -> 15
+total -= 3    # 12
+total *= 2    # 24
+total //= 5   # 4
+total **= 2   # 16
+print(total)</pre>
+</section>
+
+<!-- ===================== 4. TESTE DE MESA ===================== -->
+<section class="page" id="p-mesa" data-title="Teste de mesa" hidden>
+  <div class="eyebrow">Lição 4 · Teste de mesa</div>
+  <h1>Teste de mesa: rodar o programa na cabeça</h1>
+  <p class="lead">Fazer teste de mesa é executar o algoritmo à mão, linha por linha, anotando o valor de cada variável numa tabela. É o melhor jeito de achar erros de lógica.</p>
+
+  <h2>Como fazer</h2>
+  <ol>
+    <li>Desenhe uma coluna para cada variável.</li>
+    <li>Leia uma linha do algoritmo por vez.</li>
+    <li>Toda vez que uma variável recebe valor, escreva o novo valor embaixo (risque o antigo).</li>
+    <li>Nas decisões (<code>if</code>), calcule a condição e siga só o caminho que deu verdadeiro.</li>
+  </ol>
+
+  <h2>Pratique: exercício 27</h2>
+  <p>O algoritmo lê <code>x</code> e <code>y</code>, calcula <code>z = x*y + 5</code> e classifica: <code>z &lt;= 0</code> → A, <code>z &lt;= 100</code> → B, senão → C. Preencha a tabela e clique em conferir.</p>
+  <div class="tablewrap mesa"><table id="mesa27">
+    <tr><th>X</th><th>Y</th><th>Z</th><th>Resposta</th></tr>
+  </table></div>
+  <div class="btnrow"><button class="btn primary" type="button" id="mesa27btn">Conferir respostas</button><span id="mesa27msg" style="align-self:center"></span></div>
+  <p>Depois confira com o Python:</p>
+  <pre class="code">for x, y in [(3, 2), (150, 3), (7, -1), (-2, 5), (50, 3)]:
+    z = (x * y) + 5
+    if z &lt;= 0:
+        resposta = "A"
+    elif z &lt;= 100:
+        resposta = "B"
+    else:
+        resposta = "C"
+    print(x, y, z, resposta)</pre>
+
+  <h2>Exercício 32: separando dígitos</h2>
+  <p>Faça a tabela de <code>NUM</code>, <code>DIGITO1..4</code> e depois rode:</p>
+  <pre class="code">num = 1352
+digito4 = num % 10
+digito3 = (num // 10) % 10
+digito2 = (num // 100) % 10
+digito1 = (num // 1000) % 10
+print(digito4, digito3, digito2, digito1)</pre>
+
+  <h2>Exercício 30</h2>
+  <pre class="code">A, B, C = False, True, False
+X, Y = 1.8, 3.4
+X = X + 1
+if C or ((X + Y &gt; 5) or (A and B)):
+    L = 0
+else:
+    L = 1
+print("X + Y =", X + Y, "-> L =", L)</pre>
+
+  <h2>Teste de mesa com print</h2>
+  <p>No computador, o jeito mais rápido de "ver" as variáveis é colocar <code>print</code> dentro do laço. Isso é um teste de mesa automático:</p>
+  <pre class="code">soma = 0
+for i in range(1, 6):
+    soma = soma + i
+    print(f"i={i}  soma={soma}")</pre>
+</section>
+
+<!-- ===================== 5. SEQUÊNCIA ===================== -->
+<section class="page" id="p-sequencia" data-title="Sequência: entrada e saída" hidden>
+  <div class="eyebrow">Lição 5 · Sequência</div>
+  <h1>Entrada, contas e saída</h1>
+  <p class="lead">Estrutura sequencial: as instruções rodam uma depois da outra, de cima para baixo, sem desvio. É o capítulo dos exercícios 33 a 71.</p>
+
+  <h2>print: mostrar na tela</h2>
+  <pre class="code">print("Olá, mundo!")
+print("Soma:", 2 + 3)            # vários itens separados por espaço
+print("a", "b", "c", sep="-")    # muda o separador
+print("sem pular linha", end=" ")
+print("continua aqui")</pre>
+
+  <h2>input: ler do teclado</h2>
+  <p>O texto entre parênteses é a mensagem que aparece para o usuário. O resultado é sempre <code>str</code>.</p>
+  <pre class="code" data-stdin="Ana|17|1.68">nome = input("Seu nome: ")
+idade = int(input("Sua idade: "))        # inteiro
+altura = float(input("Sua altura (m): "))  # real
+print(nome, "tem", idade, "anos e", altura, "m")</pre>
+  <div class="note warn"><p>Esqueceu de converter? <code>input("x: ") + 1</code> dá <b>TypeError</b> (texto + número). Sempre use <code>int(...)</code> ou <code>float(...)</code> em volta do <code>input</code> quando o dado for número.</p></div>
+
+  <h2>f-strings: formatar a saída</h2>
+  <p>Coloque um <code>f</code> antes das aspas e as variáveis entre <code>{ }</code>. Para dinheiro, use <code>:.2f</code> (duas casas).</p>
+  <pre class="code">nome = "Carla"
+salario = 2500
+novo = salario * 1.22
+print(f"{nome} vai receber R$ {novo:.2f}")
+print(f"{0.1534:.1%}")        # porcentagem: 15.3%
+print(f"[{'dir':&gt;8}]")         # alinhado à direita em 8 casas
+print(f"{1234567.891:,.2f}")  # separador de milhar</pre>
+  <p>Para o formato brasileiro (vírgula decimal), troque os caracteres:</p>
+  <pre class="code">valor = 1234.5
+texto = f"{valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+print("R$", texto)   # R$ 1.234,50</pre>
+
+  <h2>Modelo pronto para os exercícios de sequência</h2>
+  <p>Exercício 47 (aumento de 22%) e 66 (IMC) no mesmo formato. Repare: entrada, conta, saída.</p>
+  <pre class="code" data-stdin="1800">salario = float(input("Salário: "))
+novo_salario = salario * 1.22          # 22% a mais = multiplicar por 1.22
+print(f"Novo salário: R$ {novo_salario:.2f}")</pre>
+  <pre class="code" data-stdin="70|1.75">massa = float(input("Massa (kg): "))
+altura = float(input("Altura (m): "))
+imc = massa / altura ** 2
+print(f"IMC = {imc:.1f}")</pre>
+  <div class="note tip"><p><b>Porcentagens:</b> aumento de 22% → <code>valor * 1.22</code>. Desconto de 20% → <code>valor * 0.80</code>. "X% de valor" → <code>valor * X / 100</code>.</p></div>
+  <p>Precisa de raiz quadrada ou π (exercícios 36, 56, 67)? Importe o módulo <code>math</code>:</p>
+  <pre class="code">import math
+print(math.sqrt(3**2 + 4**2))   # hipotenusa: 5.0
+raio = 2
+print(2 * math.pi * raio)        # comprimento da circunferência
+print(4/3 * math.pi * raio**3)   # volume da esfera</pre>
+</section>
+
+<!-- ===================== 6. SELEÇÃO ===================== -->
+<section class="page" id="p-selecao" data-title="Seleção (if)" hidden>
+  <div class="eyebrow">Lição 6 · Seleção</div>
+  <h1>Decisões com if, elif e else</h1>
+  <p class="lead">A estrutura de seleção escolhe qual bloco executar conforme uma condição. Exercícios 72 a 115.</p>
+
+  <h2>A forma geral</h2>
+  <pre class="code" data-stdin="6.5">media = float(input("Média: "))
+
+if media &gt;= 7:
+    print("Aprovado")
+elif media &gt;= 5:
+    print("Recuperação")
+else:
+    print("Reprovado")
+
+print("Fim")  # fora do if: roda sempre</pre>
+  <ul>
+    <li>Todo <code>if</code>, <code>elif</code> e <code>else</code> termina com <b>dois-pontos</b> <code>:</code>.</li>
+    <li>O bloco de dentro tem <b>4 espaços</b> de recuo. É o recuo que diz o que está dentro do <code>if</code> (no Portugol era o <code>fim_se</code>).</li>
+    <li>O Python testa de cima para baixo e executa <b>só o primeiro</b> bloco verdadeiro.</li>
+  </ul>
+
+  <h2>Faixas de valores</h2>
+  <p>Tabelas como as dos exercícios 77, 96, 97 e 114 viram uma cadeia de <code>elif</code>. Como o primeiro verdadeiro ganha, você só precisa testar o limite de cima:</p>
+  <pre class="code" data-stdin="2500">salario = float(input("Salário atual: "))
+
+if salario &lt;= 1000:
+    aumento = 0.20
+elif salario &lt;= 5000:      # aqui já sabemos que é &gt; 1000
+    aumento = 0.10
+else:
+    aumento = 0.0
+
+print(f"Novo salário: R$ {salario * (1 + aumento):.2f}")</pre>
+  <p>Python aceita comparações encadeadas, como na matemática:</p>
+  <pre class="code">n = 5
+print(1 &lt;= n &lt;= 9)      # exercício 87: está na faixa?
+idade = 15
+print(16 &lt;= idade &lt; 18) # voto facultativo?</pre>
+
+  <h2>Condições compostas</h2>
+  <pre class="code">idade, tempo = 61, 26
+# exercício 115: qualquer um dos requisitos serve -&gt; OR
+if idade &gt;= 65 or tempo &gt;= 30 or (idade &gt;= 60 and tempo &gt;= 25):
+    print("Requerer aposentadoria")
+else:
+    print("Não requerer")</pre>
+
+  <h2>Ifs aninhados</h2>
+  <p>Um <code>if</code> dentro do outro. Útil quando a segunda pergunta só faz sentido depois da primeira (exercício 84):</p>
+  <pre class="code" data-stdin="6|5|7|6|8">notas = [float(input(f"Nota {i}: ")) for i in range(1, 5)]
+media = sum(notas) / 4
+if media &gt;= 7:
+    print(f"Aprovado com média {media:.1f}")
+else:
+    exame = float(input("Nota do exame: "))
+    nova = (media + exame) / 2
+    if nova &gt;= 5:
+        print(f"Aprovado em exame com média {nova:.1f}")
+    else:
+        print(f"Reprovado com média {nova:.1f}")</pre>
+
+  <h2>If de uma linha</h2>
+  <pre class="code">n = 7
+paridade = "par" if n % 2 == 0 else "ímpar"
+print(n, "é", paridade)</pre>
+
+  <h2>Valores "verdadeiros" e "falsos"</h2>
+  <p>Zero, texto vazio <code>""</code>, lista vazia <code>[]</code> e <code>None</code> contam como falso. O resto conta como verdadeiro.</p>
+  <pre class="code">nome = ""
+if not nome:
+    print("Nome não informado")</pre>
+</section>
+
+<!-- ===================== 7. MÚLTIPLA ESCOLHA ===================== -->
+<section class="page" id="p-escolha" data-title="Múltipla escolha" hidden>
+  <div class="eyebrow">Lição 7 · Múltipla escolha</div>
+  <h1>Escolha-caso: match, elif e dicionários</h1>
+  <p class="lead">Quando uma variável pode ter vários valores e cada um leva a uma ação diferente (menus, códigos de produto, meses). Exercícios 116 a 122.</p>
+
+  <h2>match / case (Python 3.10+)</h2>
+  <p>É o <code>escolha</code> do Portugol. O <code>case _</code> é o "senão" (qualquer outro valor).</p>
+  <pre class="code" data-stdin="6">codigo = int(input("Código do produto: "))
+match codigo:
+    case 1:
+        print("Alimento não-perecível")
+    case 2 | 3 | 4:                       # vários valores no mesmo caso
+        print("Alimento perecível")
+    case 5 | 6:
+        print("Vestuário")
+    case 7:
+        print("Higiene Pessoal")
+    case n if 8 &lt;= n &lt;= 15:             # faixa com "guarda"
+        print("Limpeza e Utensílios Domésticos")
+    case _:
+        print("Código inválido")</pre>
+
+  <h2>Com elif (funciona em qualquer versão)</h2>
+  <pre class="code">codigo = 3
+if codigo == 1:
+    print("Alimento não-perecível")
+elif codigo in (2, 3, 4):
+    print("Alimento perecível")
+else:
+    print("Outro")</pre>
+
+  <h2>Tabela de preços com dicionário</h2>
+  <p>Quando a escolha é só "buscar um valor numa tabela" (cardápios dos exercícios 116 e 117), um dicionário resolve sem nenhum <code>if</code>:</p>
+  <pre class="code" data-stdin="102|3">cardapio = {
+    100: ("Cachorro quente", 1.20),
+    101: ("Bauru simples", 1.30),
+    102: ("Bauru com ovo", 1.50),
+    103: ("Hambúrguer", 1.20),
+    104: ("Cheeseburguer", 1.30),
+    105: ("Refrigerante", 1.00),
+}
+codigo = int(input("Código: "))
+qtd = int(input("Quantidade: "))
+if codigo in cardapio:
+    nome, preco = cardapio[codigo]
+    print(f"{qtd}x {nome} = R$ {qtd * preco:.2f}")
+else:
+    print("Código inválido")</pre>
+
+  <h2>Menu que repete</h2>
+  <p>Exercício 121 e a calculadora: um menu dentro de um laço, que só para quando o usuário escolhe sair.</p>
+  <pre class="code" data-stdin="+|8|2|/|9|3|S">while True:
+    op = input("Operação (+ - * /) ou S para sair: ").strip().upper()
+    if op == "S":
+        print("Até mais!")
+        break
+    a = float(input("a: "))
+    b = float(input("b: "))
+    match op:
+        case "+": print("Resultado:", a + b)
+        case "-": print("Resultado:", a - b)
+        case "*": print("Resultado:", a * b)
+        case "/":
+            if b == 0:
+                print("Não existe divisão por zero")
+            else:
+                print("Resultado:", a / b)
+        case _:
+            print("Operação inválida")</pre>
+</section>
+
+<!-- ===================== 8. REPETIÇÃO ===================== -->
+<section class="page" id="p-repeticao" data-title="Repetição" hidden>
+  <div class="eyebrow">Lição 8 · Repetição</div>
+  <h1>Laços: for e while</h1>
+  <p class="lead">Repetir um bloco várias vezes. É o maior capítulo da lista (123 a 187) e o que mais treina lógica.</p>
+
+  <h2>for com range: quando você sabe quantas vezes</h2>
+  <pre class="code">for i in range(5):          # 0, 1, 2, 3, 4
+    print(i, end=" ")
+print()
+for i in range(1, 11):      # 1 até 10 (o 11 não entra!)
+    print(i, end=" ")
+print()
+for i in range(10, 0, -1):  # 10 até 1, contando para trás (ex. 139)
+    print(i, end=" ")
+print()
+for i in range(10, 1001, 10):  # 10, 20, ..., 1000 (ex. 136)
+    pass
+print("último:", i)</pre>
+  <div class="tablewrap"><table>
+    <tr><th>Portugol</th><th>Python</th></tr>
+    <tr><td><code>para i de 1 até N faça</code></td><td><code>for i in range(1, n + 1):</code></td></tr>
+    <tr><td><code>para i de N até 1 passo -1</code></td><td><code>for i in range(n, 0, -1):</code></td></tr>
+    <tr><td><code>para i de 0 até 100 passo 2</code></td><td><code>for i in range(0, 101, 2):</code></td></tr>
+  </table></div>
+
+  <h2>while: enquanto a condição for verdadeira</h2>
+  <pre class="code">contador = 1
+while contador &lt;= 5:
+    print("Volta", contador)
+    contador += 1      # sem isso o laço nunca acaba!</pre>
+  <div class="note warn"><p><b>Laço infinito:</b> se a condição do <code>while</code> nunca ficar falsa, o programa não para. Aqui no navegador isso trava a aba. Confira sempre se alguma coisa dentro do laço muda a condição.</p></div>
+
+  <h2>Os 4 padrões que resolvem quase tudo</h2>
+  <h3>1. Contador: quantos?</h3>
+  <pre class="code">idades = [15, 22, 51, 19, 63, 30]
+menores_21 = 0
+for idade in idades:
+    if idade &lt; 21:
+        menores_21 += 1        # conta +1
+print("Menores de 21:", menores_21)</pre>
+  <h3>2. Acumulador: quanto ao todo?</h3>
+  <pre class="code">soma = 0
+for n in range(2, 101, 2):     # pares de 1 a 100 (ex. 157)
+    soma += n                  # acumula o valor
+print("Soma dos pares:", soma)</pre>
+  <h3>3. Maior e menor</h3>
+  <p>Comece com o <b>primeiro valor</b> (não com zero!) e compare com cada um dos outros.</p>
+  <pre class="code" data-stdin="5|17|3|9|12|8">n = int(input("Quantos números? "))
+maior = menor = None
+for i in range(n):
+    x = int(input(f"Número {i + 1}: "))
+    if maior is None or x &gt; maior:
+        maior = x
+    if menor is None or x &lt; menor:
+        menor = x
+print("Maior:", maior, "Menor:", menor)</pre>
+  <h3>4. Flag (valor de parada)</h3>
+  <p>"Leia até digitar 0" (exercícios 130, 135, 156, 173). O 0 não entra na conta.</p>
+  <pre class="code" data-stdin="8|4|6|0">soma = 0
+quantidade = 0
+numero = int(input("Número (0 para parar): "))
+while numero != 0:
+    soma += numero
+    quantidade += 1
+    numero = int(input("Número (0 para parar): "))
+
+if quantidade &gt; 0:
+    print("Média:", soma / quantidade)
+else:
+    print("Nenhum número digitado")</pre>
+  <p>Outra forma, com <code>while True</code> e <code>break</code>. É o "repita… até" do Portugol:</p>
+  <pre class="code" data-stdin="10|-3">while True:
+    valor = float(input("Valor positivo: "))
+    if valor &gt; 0:
+        break
+    print("Inválido, digite de novo")
+print("Ok:", valor)</pre>
+
+  <h2>break, continue e else</h2>
+  <pre class="code">for n in range(1, 21):
+    if n % 3 == 0:
+        continue     # pula para a próxima volta
+    if n &gt; 10:
+        break        # sai do laço
+    print(n, end=" ")
+print()
+
+# for ... else: o else roda se o laço NÃO saiu por break
+n = 29
+for d in range(2, n):
+    if n % d == 0:
+        print(n, "não é primo")
+        break
+else:
+    print(n, "é primo")</pre>
+
+  <h2>Laços aninhados</h2>
+  <pre class="code">for i in range(1, 4):
+    for j in range(1, 4):
+        print(f"{i}x{j}={i*j}", end="  ")
+    print()</pre>
+
+  <h2>Ferramentas úteis</h2>
+  <pre class="code">nomes = ["Ana", "Bia", "Caio"]
+notas = [8.0, 6.5, 9.2]
+for i, nome in enumerate(nomes):      # índice e valor juntos
+    print(i, nome)
+for nome, nota in zip(nomes, notas):  # percorre duas listas juntas
+    print(nome, nota)
+print(sum(notas), max(notas), min(notas), len(notas))</pre>
+</section>
+
+<!-- ===================== 9. TEXTOS ===================== -->
+<section class="page" id="p-textos" data-title="Textos (strings)" hidden>
+  <div class="eyebrow">Lição 9 · Strings</div>
+  <h1>Trabalhando com textos</h1>
+  <p class="lead">Uma <code>str</code> é uma sequência de caracteres. Dá para acessar cada letra, fatiar, procurar e transformar.</p>
+
+  <h2>Índices e fatias</h2>
+  <pre class="code">s = "PYTHON"
+print(s[0], s[1], s[-1])   # P Y N  (negativo conta do fim)
+print(s[0:3])              # PYT  (do 0 até antes do 3)
+print(s[2:])               # THON
+print(s[::-1])             # NOHTYP (invertido)
+print(len(s))              # 6
+for letra in s:
+    print(letra, end=" ")</pre>
+  <div class="note"><p>Strings não mudam (são imutáveis). <code>s[0] = "J"</code> dá erro. Para "mudar", crie outra: <code>s = "J" + s[1:]</code>.</p></div>
+
+  <h2>Métodos mais usados</h2>
+  <pre class="code">frase = "  Socorram me subi no onibus em Marrocos  "
+print(frase.strip())                 # tira espaços das pontas
+print(frase.upper())                 # MAIÚSCULAS
+print(frase.lower())                 # minúsculas
+print(frase.strip().title())         # Cada Palavra Maiúscula
+print(frase.replace(" ", ""))        # remove todos os espaços
+print(frase.split())                 # quebra em lista de palavras
+print("-".join(["a", "b", "c"]))     # junta lista com separador: a-b-c
+print(frase.count("o"))              # quantas vezes aparece
+print(frase.find("subi"))            # posição (ou -1)
+print("onibus" in frase)             # True
+print("123".isdigit(), "abc".isalpha())</pre>
+  <p>A lista completa está em <a href="#metodos">Métodos</a>.</p>
+
+  <h2>Exemplo: palíndromo (exercício 243)</h2>
+  <pre class="code">def eh_palindromo(texto):
+    limpo = texto.replace(" ", "").lower()
+    return limpo == limpo[::-1]
+
+for nome in ["ARARA", "ANA", "Pedro", "Socorram me subi no onibus em Marrocos"]:
+    print(nome, "-&gt;", eh_palindromo(nome))</pre>
+
+  <h2>Contando letras (exercícios 174 e 247)</h2>
+  <pre class="code">frase = "programar em python e divertido"
+vogais = {"a": 0, "e": 0, "i": 0, "o": 0, "u": 0}
+for letra in frase:
+    if letra in vogais:
+        vogais[letra] += 1
+print(vogais)</pre>
+
+  <h2>Caracteres e códigos</h2>
+  <pre class="code">print(ord("A"), chr(66))   # 65 B
+print(ord("a") - ord("A")) # distância entre minúscula e maiúscula</pre>
+</section>
+
+<!-- ===================== 10. VETORES ===================== -->
+<section class="page" id="p-vetores" data-title="Vetor e matriz (listas)" hidden>
+  <div class="eyebrow">Lição 10 · Vetor e matriz</div>
+  <h1>Listas: vetores e matrizes em Python</h1>
+  <p class="lead">O vetor do Portugol vira uma <code>list</code>. Ela guarda vários valores em ordem, cresce sozinha e aceita qualquer tipo. Exercícios 188 a 273.</p>
+
+  <h2>Criando e acessando</h2>
+  <pre class="code">notas = [7.5, 8.0, 6.0, 9.5]
+print(notas[0])        # primeiro: 7.5   (índice começa em 0!)
+print(notas[-1])       # último: 9.5
+notas[2] = 6.5         # altera a posição 2
+print(notas, len(notas))
+
+vazio = []
+zeros = [0] * 10       # vetor de 10 posições com zero
+print(zeros)</pre>
+  <div class="note warn"><p>No Portugol o vetor costuma ir de 1 a N. Em Python vai de <b>0 a N-1</b>. Acessar <code>v[len(v)]</code> dá <b>IndexError</b>.</p></div>
+
+  <h2>Lendo um vetor do usuário</h2>
+  <pre class="code" data-stdin="4|8|15|16|23|42">n = int(input("Quantos valores? "))
+v = []
+for i in range(n):
+    v.append(int(input(f"v[{i}] = ")))   # append adiciona no fim
+print("Vetor:", v)
+print("Invertido:", v[::-1])              # exercício 188/229
+print("Soma:", sum(v), "Média:", sum(v) / len(v))</pre>
+  <p>Ou numa linha só, com os números separados por espaço:</p>
+  <pre class="code" data-stdin="5 3 9 1 7">v = [int(x) for x in input("Números: ").split()]
+print(v, "maior:", max(v), "na posição", v.index(max(v)))</pre>
+
+  <h2>Métodos de lista</h2>
+  <pre class="code">v = [5, 3, 8]
+v.append(1)        # [5, 3, 8, 1]
+v.insert(0, 9)     # [9, 5, 3, 8, 1]
+v.remove(3)        # remove o primeiro 3
+ultimo = v.pop()   # tira e devolve o último
+v.sort()           # ordena (muda a lista)
+print(v, ultimo)
+print(sorted([3, 1, 2], reverse=True))  # cria lista nova ordenada
+print(8 in v, v.count(8), v.index(8))</pre>
+
+  <h2>Percorrendo dois vetores (exercícios 189, 204, 230)</h2>
+  <pre class="code">a = [23, 37, 30]
+b = [30, 32, 46]
+c = []
+for i in range(len(a)):
+    c.append(a[i] + b[i])
+print(c)
+print([x + y for x, y in zip(a, b)])   # mesma coisa, em uma linha</pre>
+
+  <h2>List comprehension</h2>
+  <p>Um jeito curto de criar listas a partir de outras:</p>
+  <pre class="code">v = [4, -2, 7, 0, -9, 12]
+negativos = [x for x in v if x &lt; 0]       # exercício 202
+pares = [x for x in v if x % 2 == 0]
+dobro = [x * 2 for x in v]                  # exercício 228
+print(negativos, pares, dobro)</pre>
+
+  <h2>Ordenação na mão (exercício 232)</h2>
+  <p>A professora pode pedir sem usar <code>sort()</code>. O método da bolha compara vizinhos e troca:</p>
+  <pre class="code">v = [5, 2, 9, 1, 7]
+n = len(v)
+for i in range(n - 1):
+    for j in range(n - 1 - i):
+        if v[j] &gt; v[j + 1]:
+            v[j], v[j + 1] = v[j + 1], v[j]
+print(v)</pre>
+
+  <h2>Matrizes: lista de listas</h2>
+  <pre class="code">m = [
+    [1, 2, 3],
+    [4, 5, 6],
+]
+print(m[1][2])            # linha 1, coluna 2 -&gt; 6
+linhas, colunas = len(m), len(m[0])
+
+for i in range(linhas):   # percorre tudo
+    for j in range(colunas):
+        print(m[i][j], end="\t")
+    print()
+
+soma_linhas = [sum(linha) for linha in m]      # exercício 272
+print(soma_linhas, "total:", sum(soma_linhas))
+
+transposta = [[m[i][j] for i in range(linhas)] for j in range(colunas)]
+print(transposta)                              # exercício 219/270</pre>
+  <p>Criando uma matriz vazia N×M do jeito certo:</p>
+  <pre class="code">n, m = 3, 4
+mat = [[0] * m for _ in range(n)]   # certo
+mat[0][0] = 9
+print(mat)
+
+errado = [[0] * m] * n              # ERRADO: as linhas são a mesma lista
+errado[0][0] = 9
+print(errado)                       # o 9 aparece em todas as linhas!</pre>
+  <p>Diagonais de uma matriz quadrada:</p>
+  <pre class="code">m = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+n = len(m)
+principal = [m[i][i] for i in range(n)]
+secundaria = [m[i][n - 1 - i] for i in range(n)]
+print(principal, secundaria)</pre>
+</section>
+
+<!-- ===================== 11. REGISTROS ===================== -->
+<section class="page" id="p-registros" data-title="Registros (dicionários)" hidden>
+  <div class="eyebrow">Lição 11 · Registros</div>
+  <h1>Registros com dicionários</h1>
+  <p class="lead">Um registro junta dados diferentes de uma mesma coisa (nome, idade, endereço de uma pessoa). Em Python, o jeito mais simples é o <code>dict</code>: pares de <b>chave: valor</b>.</p>
+
+  <h2>Criando e usando um dicionário</h2>
+  <pre class="code">aluno = {"nome": "Ana", "idade": 17, "notas": [8.0, 7.5, 9.0]}
+print(aluno["nome"])
+aluno["idade"] = 18                 # altera
+aluno["curso"] = "DS"               # cria chave nova
+print(aluno.get("email", "sem e-mail"))   # get evita erro se não existir
+print("notas" in aluno)
+for chave, valor in aluno.items():
+    print(chave, "=&gt;", valor)</pre>
+
+  <h2>Lista de registros (exercício 274)</h2>
+  <pre class="code">pessoas = [
+    {"nome": "Ana", "idade": 17},
+    {"nome": "Bruno", "idade": 25},
+    {"nome": "Carla", "idade": 31},
+    {"nome": "Davi", "idade": 15},
+]
+primeira = pessoas[0]["idade"]
+print("Mais velhos que a primeira:", [p["nome"] for p in pessoas if p["idade"] &gt; primeira])
+
+media = sum(p["idade"] for p in pessoas) / len(pessoas)
+print("Acima da média:", [p["nome"] for p in pessoas if p["idade"] &gt; media])
+
+mais_velha = max(pessoas, key=lambda p: p["idade"])
+mais_nova = min(pessoas, key=lambda p: p["idade"])
+print("Maior idade:", mais_velha["nome"], "| Menor:", mais_nova["nome"])</pre>
+
+  <h2>Registro dentro de registro (exercício 275)</h2>
+  <pre class="code">aluno = {
+    "nome": "Ana",
+    "endereco": {"rua": "Rua A, 10", "bairro": "Centro", "cidade": "São Paulo", "estado": "SP", "cep": "01000-000"},
+}
+print(aluno["endereco"]["cidade"])</pre>
+
+  <h2>Dicionário para contar</h2>
+  <pre class="code">valores = [3, 1, 3, 2, 3, 1]
+contagem = {}
+for v in valores:
+    contagem[v] = contagem.get(v, 0) + 1   # exercício 251
+print(contagem)</pre>
+
+  <h2>Tuplas e conjuntos</h2>
+  <p><b>Tupla</b> (<code>( )</code>) é uma lista que não muda: boa para pares fixos como coordenadas. <b>Conjunto</b> (<code>set</code>) não tem repetidos nem ordem: ótimo para "valores diferentes".</p>
+  <pre class="code">ponto = (3, 4)
+x, y = ponto                 # desempacotar
+print(x, y)
+
+numeros = [1, 2, 2, 3, 3, 3]
+print(set(numeros))          # {1, 2, 3}
+print(len(set(numeros)) != len(numeros))  # tem repetidos? (ex. 200)
+a, b = {1, 2, 3}, {2, 3, 4}
+print(a &amp; b, a | b, a - b)   # interseção, união, diferença</pre>
+
+  <h2>Registro com classe (opcional)</h2>
+  <p>Para registros com formato fixo, uma <code>dataclass</code> deixa o código mais organizado:</p>
+  <pre class="code">from dataclasses import dataclass
+
+@dataclass
+class Produto:
+    codigo: int
+    qtd_min: int
+    qtd_max: int
+    qtd_est: int
+
+produtos = [Produto(1, 10, 50, 8), Produto(2, 5, 30, 20)]
+for p in produtos:                       # exercício 277
+    if p.qtd_est &lt;= p.qtd_min:
+        print("Comprar", p.qtd_max - p.qtd_est, "do produto", p.codigo)</pre>
+</section>
+
+<!-- ===================== 12. FUNÇÕES ===================== -->
+<section class="page" id="p-funcoes" data-title="Procedimentos e funções" hidden>
+  <div class="eyebrow">Lição 12 · Procedimentos e funções</div>
+  <h1>Funções: dar nome a um pedaço de código</h1>
+  <p class="lead">Uma função recebe dados (parâmetros), faz um trabalho e pode devolver um resultado (<code>return</code>). Sem <code>return</code> ela é o que o Portugol chama de <b>procedimento</b>.</p>
+
+  <h2>Definindo e chamando</h2>
+  <pre class="code">def saudacao(nome):                 # procedimento: só mostra
+    print(f"Olá, {nome}!")
+
+def area_retangulo(base, altura):   # função: devolve um valor
+    return base * altura
+
+saudacao("Ana")
+a = area_retangulo(3, 4)
+print("Área:", a)
+print(area_retangulo(2.5, 2) + 1)</pre>
+  <div class="note tip"><p><b>print vs return:</b> <code>print</code> só mostra na tela. <code>return</code> entrega o valor para quem chamou, que pode guardar numa variável, fazer contas ou mostrar. Nos exercícios com correção automática, a função precisa <b>retornar</b>.</p></div>
+
+  <h2>Parâmetros com valor padrão e nomeados</h2>
+  <pre class="code">def preco_final(preco, desconto=0.0, frete=10):
+    return preco * (1 - desconto) + frete
+
+print(preco_final(100))                  # 110.0
+print(preco_final(100, 0.2))             # 90.0
+print(preco_final(100, frete=0))         # 100.0</pre>
+
+  <h2>Retornando vários valores</h2>
+  <pre class="code">def divisao(a, b):
+    return a // b, a % b      # devolve uma tupla
+
+q, r = divisao(17, 5)
+print("quociente", q, "resto", r)</pre>
+
+  <h2>Escopo: variáveis locais</h2>
+  <p>O que é criado dentro da função só existe lá dentro. Para usar fora, devolva com <code>return</code>.</p>
+  <pre class="code">def dobra(x):
+    resultado = x * 2
+    return resultado
+
+print(dobra(5))
+# print(resultado)  -&gt; NameError: resultado só existe dentro da função</pre>
+
+  <h2>Programa organizado em funções</h2>
+  <p>Exercício 279: uma função por operação e um procedimento que conversa com o usuário.</p>
+  <pre class="code" data-stdin="3|7|2">def somar(a, b): return a + b
+def subtrair(a, b): return a - b
+def multiplicar(a, b): return a * b
+def dividir(a, b): return a / b if b != 0 else None
+
+def menu():
+    print("1-Somar 2-Subtrair 3-Multiplicar 4-Dividir")
+    op = int(input("Opção: "))
+    a = float(input("a: "))
+    b = float(input("b: "))
+    operacoes = {1: somar, 2: subtrair, 3: multiplicar, 4: dividir}
+    resultado = operacoes[op](a, b)
+    print("Resultado:", resultado)
+
+menu()</pre>
+
+  <h2>Funções que chamam a si mesmas (recursão)</h2>
+  <p>Precisa de um <b>caso base</b> (onde para) e de um <b>passo</b> que se aproxima dele.</p>
+  <pre class="code">def fatorial(n):
+    if n &lt;= 1:            # caso base
+        return 1
+    return n * fatorial(n - 1)   # passo
+
+print(fatorial(5), fatorial(10))</pre>
+
+  <h2>lambda: função de uma linha</h2>
+  <pre class="code">quadrado = lambda x: x ** 2
+print(quadrado(9))
+alunos = [("Ana", 8.5), ("Bia", 9.7), ("Caio", 6.0)]
+print(sorted(alunos, key=lambda a: a[1], reverse=True))  # ordena pela nota</pre>
+
+  <h2>Documentando</h2>
+  <pre class="code">def eh_bissexto(ano: int) -&gt; bool:
+    """Retorna True se o ano for bissexto."""
+    return ano % 4 == 0 and (ano % 100 != 0 or ano % 400 == 0)
+
+print(eh_bissexto(2024), eh_bissexto(1900), eh_bissexto(2000))</pre>
+</section>
+
+<!-- ===================== 13. ERROS ===================== -->
+<section class="page" id="p-erros" data-title="Erros e validação" hidden>
+  <div class="eyebrow">Lição 13 · Erros</div>
+  <h1>Erros comuns e como tratar</h1>
+
+  <h2>Lendo a mensagem de erro</h2>
+  <p>A última linha da mensagem diz o <b>tipo</b> do erro. Aqui o caderno também explica cada um em português.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Erro</th><th>Causa típica</th></tr>
+    <tr><td><code>SyntaxError</code></td><td>faltou <code>:</code>, parêntese ou aspas</td></tr>
+    <tr><td><code>IndentationError</code></td><td>recuo errado dentro de if/for/def</td></tr>
+    <tr><td><code>NameError</code></td><td>variável não criada ou nome digitado errado</td></tr>
+    <tr><td><code>TypeError</code></td><td>misturou tipos: <code>"5" + 1</code></td></tr>
+    <tr><td><code>ValueError</code></td><td>conversão impossível: <code>int("abc")</code></td></tr>
+    <tr><td><code>IndexError</code></td><td>posição fora da lista</td></tr>
+    <tr><td><code>KeyError</code></td><td>chave que não existe no dicionário</td></tr>
+    <tr><td><code>ZeroDivisionError</code></td><td>divisão por zero</td></tr>
+  </table></div>
+  <p>Rode e leia a explicação:</p>
+  <pre class="code">idade = 17
+print("Idade: " + idade)</pre>
+
+  <h2>try / except</h2>
+  <pre class="code" data-stdin="abc|12">try:
+    n = int(input("Número: "))
+    print("Dobro:", n * 2)
+except ValueError:
+    print("Isso não é um número inteiro!")</pre>
+
+  <h2>Validar até acertar</h2>
+  <p>O padrão mais útil da lição: repetir a pergunta até o usuário digitar algo válido (exercícios 181 e o desafio do 170).</p>
+  <pre class="code" data-stdin="dez|-5|0|4">def ler_positivo(msg):
+    while True:
+        try:
+            valor = float(input(msg))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if valor &gt; 0:
+            return valor
+        print("O valor precisa ser maior que zero.")
+
+divisor = ler_positivo("Divisor: ")
+print("10 /", divisor, "=", 10 / divisor)</pre>
+
+  <h2>else, finally e raise</h2>
+  <pre class="code">def sacar(saldo, valor):
+    if valor &gt; saldo:
+        raise ValueError("Saldo insuficiente")
+    return saldo - valor
+
+try:
+    novo = sacar(100, 250)
+except ValueError as erro:
+    print("Erro:", erro)
+else:
+    print("Novo saldo:", novo)     # roda se não houve erro
+finally:
+    print("Operação encerrada")    # roda sempre</pre>
+</section>
+
+<!-- ===================== 14. MÓDULOS ===================== -->
+<section class="page" id="p-modulos" data-title="Módulos úteis" hidden>
+  <div class="eyebrow">Lição 14 · Módulos</div>
+  <h1>Módulos: math, random e datetime</h1>
+  <p class="lead">Módulos são pacotes de funções prontas. Você importa e usa.</p>
+
+  <h2>Formas de importar</h2>
+  <pre class="code">import math
+print(math.sqrt(16))
+
+from math import pi, ceil
+print(pi, ceil(4.1))
+
+import random as rd
+print(rd.randint(1, 6))</pre>
+
+  <h2>math</h2>
+  <pre class="code">import math
+print(math.sqrt(2))       # raiz quadrada
+print(math.pi, math.e)
+print(math.ceil(2.1))     # arredonda para cima: 3 (azulejos, ex. 65)
+print(math.floor(2.9))    # para baixo: 2
+print(math.pow(2, 10))    # 1024.0
+print(math.factorial(5))  # 120
+print(math.gcd(12, 18))   # MDC: 6
+print(math.hypot(3, 4))   # hipotenusa: 5.0</pre>
+
+  <h2>random</h2>
+  <pre class="code">import random
+print(random.randint(1, 60))            # inteiro entre 1 e 60
+print(random.random())                  # real entre 0 e 1
+print(random.choice(["pedra", "papel", "tesoura"]))
+palpite = sorted(random.sample(range(1, 61), 6))   # 6 números sem repetir (ex. 278)
+print("Mega-Sena:", palpite)
+cartas = [1, 2, 3, 4, 5]
+random.shuffle(cartas)
+print(cartas)</pre>
+
+  <h2>datetime</h2>
+  <pre class="code">from datetime import date
+hoje = date.today()
+print(hoje, hoje.year)
+nascimento = date(2008, 3, 15)
+idade_dias = (hoje - nascimento).days
+print("Dias de vida:", idade_dias)
+print(hoje.strftime("%d/%m/%Y"))</pre>
+</section>
+
+<!-- ===================== 15. ARQUIVOS ===================== -->
+<section class="page" id="p-arquivos" data-title="Arquivos" hidden>
+  <div class="eyebrow">Lição 15 · Arquivos</div>
+  <h1>Lendo e gravando arquivos</h1>
+  <p class="lead">Para guardar dados depois que o programa termina (exercício 276). Os exemplos desta lição não rodam no navegador: teste no seu computador.</p>
+
+  <h2>Gravar</h2>
+<pre class="code" data-run="no">produtos = [("P01", 12.50), ("P02", 8.90)]
+with open("precos.txt", "w", encoding="utf-8") as arq:
+    for codigo, preco in produtos:
+        arq.write(f"{codigo};{preco}\n")</pre>
+  <p><code>with</code> fecha o arquivo sozinho. Modos: <code>"r"</code> ler, <code>"w"</code> escrever (apaga o que tinha), <code>"a"</code> acrescentar no fim.</p>
+
+  <h2>Ler</h2>
+<pre class="code" data-run="no">with open("precos.txt", "r", encoding="utf-8") as arq:
+    for linha in arq:
+        codigo, preco = linha.strip().split(";")
+        print(codigo, float(preco))</pre>
+
+  <h2>CSV (abre no Excel)</h2>
+<pre class="code" data-run="no">import csv
+with open("alunos.csv", "w", newline="", encoding="utf-8") as arq:
+    escritor = csv.writer(arq, delimiter=";")
+    escritor.writerow(["nome", "media"])
+    escritor.writerow(["Ana", 8.5])
+
+with open("alunos.csv", encoding="utf-8") as arq:
+    for linha in csv.DictReader(arq, delimiter=";"):
+        print(linha["nome"], linha["media"])</pre>
+</section>
+
+<!-- ===================== 16. CLASSES ===================== -->
+<section class="page" id="p-classes" data-title="Classes (POO)" hidden>
+  <div class="eyebrow">Lição 16 · Extra: orientação a objetos</div>
+  <h1>Classes e objetos</h1>
+  <p class="lead">Uma classe junta dados (atributos) e ações (métodos). É o próximo passo depois dos registros e o que vem no módulo seguinte do curso.</p>
+
+  <h2>Criando uma classe</h2>
+  <pre class="code">class ContaBancaria:
+    def __init__(self, titular, saldo=0):   # construtor
+        self.titular = titular
+        self.saldo = saldo
+
+    def depositar(self, valor):
+        self.saldo += valor
+
+    def sacar(self, valor):
+        if valor &gt; self.saldo:
+            return False
+        self.saldo -= valor
+        return True
+
+    def __str__(self):                     # como o objeto aparece no print
+        return f"{self.titular}: R$ {self.saldo:.2f}"
+
+conta = ContaBancaria("Ana", 100)
+conta.depositar(50)
+print(conta.sacar(500), conta.sacar(30))
+print(conta)</pre>
+  <ul>
+    <li><code>self</code> é o próprio objeto. Todo método recebe ele primeiro.</li>
+    <li><code>__init__</code> roda quando você cria o objeto.</li>
+  </ul>
+
+  <h2>Herança</h2>
+  <pre class="code">class Funcionario:
+    def __init__(self, nome, salario):
+        self.nome = nome
+        self.salario = salario
+    def bonus(self):
+        return self.salario * 0.10
+
+class Gerente(Funcionario):          # Gerente herda de Funcionario
+    def bonus(self):                  # sobrescreve o método
+        return self.salario * 0.20 + 500
+
+equipe = [Funcionario("Bia", 3000), Gerente("Caio", 6000)]
+for f in equipe:
+    print(f.nome, f.bonus())</pre>
+</section>
+
+
+<!-- ===================== REFERÊNCIA: FUNÇÕES EMBUTIDAS ===================== -->
+<section class="page" id="p-builtins" data-title="Funções embutidas" hidden>
+  <div class="eyebrow">Referência</div>
+  <h1>Todas as funções embutidas</h1>
+  <p class="lead">As funções que o Python traz prontas, sem precisar importar nada. Use a busca ou filtre por assunto.</p>
+  <input class="search" id="biSearch" type="search" placeholder="Buscar: len, converter, maior, ordenar…" aria-label="Buscar função">
+  <div class="chips" id="biChips"></div>
+  <p class="count" id="biCount"></p>
+  <div class="tablewrap ref"><table id="biTable"></table></div>
+</section>
+
+<!-- ===================== REFERÊNCIA: MÉTODOS ===================== -->
+<section class="page" id="p-metodos" data-title="Métodos de str, list, dict, set" hidden>
+  <div class="eyebrow">Referência</div>
+  <h1>Métodos de texto, lista, dicionário e conjunto</h1>
+  <p class="lead">Métodos são funções que pertencem a um tipo e são chamados com ponto: <code>texto.upper()</code>, <code>lista.append(x)</code>.</p>
+  <input class="search" id="mtSearch" type="search" placeholder="Buscar: split, append, get…" aria-label="Buscar método">
+  <div class="chips" id="mtChips"></div>
+  <p class="count" id="mtCount"></p>
+  <div class="tablewrap ref"><table id="mtTable"></table></div>
+</section>
+
+<!-- ===================== RECEITAS ===================== -->
+<section class="page" id="p-receitas" data-title="Como montar cada programa" hidden>
+  <div class="eyebrow">Receitas</div>
+  <h1>Como montar cada tipo de programa</h1>
+  <p class="lead">Moldes prontos para os tipos de exercício que mais caem. Copie a estrutura e troque as partes marcadas.</p>
+  <div class="chips" id="rcChips"></div>
+  <div id="rcList"></div>
+</section>
+
+<!-- ===================== EXERCÍCIOS ===================== -->
+<section class="page" id="p-exercicios" data-title="Exercícios com correção" hidden>
+  <div id="exIndex">
+    <div class="eyebrow">Praticar</div>
+    <h1>Exercícios com correção automática</h1>
+    <p class="lead">Exercícios clássicos de lógica de programação (e alguns extras) em Python. Escreva a solução, clique em <b>Verificar</b> e o caderno testa com vários casos.</p>
+    <div class="note tip">
+      <p><b>Método para resolver:</b> 1) leia o enunciado e os exemplos; 2) resolva um caso no papel; 3) escreva os passos em português como comentário; 4) traduza para Python; 5) clique em <b>Rodar</b> para ver o que acontece e em <b>Verificar</b> quando achar que está certo. Travou? Use a dica antes de olhar a solução.</p>
+    </div>
+    <div class="chips" id="exChips"></div>
+    <p class="count" id="exCount"></p>
+    <div class="exlist" id="exList"></div>
+  </div>
+  <div id="exDetail" hidden></div>
+</section>
+
+<!-- ===================== PLAYGROUND ===================== -->
+<section class="page" id="p-playground" data-title="Playground" hidden>
+  <div class="eyebrow">Praticar</div>
+  <h1>Playground</h1>
+  <p class="lead">Escreva qualquer código Python e rode. <kbd>Ctrl</kbd> + <kbd>Enter</kbd> também executa. O que você escreve fica salvo neste navegador.</p>
+  <div class="codebox">
+    <div class="bar"><span class="lbl">programa.py</span></div>
+    <textarea class="editor" id="pgCode" spellcheck="false" aria-label="Código Python" style="min-height:320px"></textarea>
+  </div>
+  <label class="small" for="pgIn">Entrada (uma linha para cada input)</label>
+  <textarea class="stdin" id="pgIn" spellcheck="false"></textarea>
+  <div class="btnrow">
+    <button class="btn go" type="button" id="pgRun">Rodar</button>
+    <button class="btn" type="button" id="pgClear">Limpar</button>
+  </div>
+  <div class="codebox" id="pgOutBox" hidden><div class="bar"><span class="lbl">saída</span></div><div class="out" id="pgOut"></div></div>
+</section>
+
+<nav class="pager" id="pager" aria-label="Navegação entre lições"></nav>
+</main>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.12.3/brython.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.12.3/brython_stdlib.min.js"></script>
+<script type="text/python" id="pyharness">
+from browser import window
+import sys
+import json
+import builtins
+
+
+class _Saida:
+    def __init__(self):
+        self.tela = []
+        self.prints = []
+
+    def write(self, s):
+        s = str(s)
+        self.tela.append(s)
+        self.prints.append(s)
+        return len(s)
+
+    def flush(self):
+        pass
+
+
+def _linha(e, ns):
+    if isinstance(e, SyntaxError):
+        return getattr(e, "lineno", None)
+    linha = None
+    try:
+        tb = e.__traceback__
+        while tb is not None:
+            if tb.tb_frame.f_globals is ns:
+                linha = tb.tb_lineno
+            tb = tb.tb_next
+    except Exception:
+        pass
+    return linha
+
+
+def _mensagem(e):
+    if isinstance(e, SyntaxError):
+        return str(getattr(e, "msg", e))
+    return str(e)
+
+
+def _igual(a, b):
+    if isinstance(a, bool) or isinstance(b, bool):
+        return type(a) is type(b) and a == b
+    numeros = (int, float)
+    if isinstance(a, numeros) and isinstance(b, numeros):
+        if isinstance(a, float) or isinstance(b, float):
+            return abs(a - b) <= 1e-6 * max(1.0, abs(b))
+        return a == b
+    if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
+        if type(a) is not type(b) or len(a) != len(b):
+            return False
+        return all(_igual(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict) and isinstance(b, dict):
+        if set(a.keys()) != set(b.keys()):
+            return False
+        return all(_igual(a[k], b[k]) for k in b)
+    return a == b
+
+
+def _rodar(codigo, entrada, testes):
+    saida = _Saida()
+    linhas = str(entrada).split("\n") if entrada else []
+
+    def _input(msg=""):
+        saida.tela.append(str(msg))
+        if not linhas:
+            raise EOFError("o programa pediu mais input() do que as linhas da caixa Entrada")
+        valor = linhas.pop(0)
+        saida.tela.append(valor + "\n")
+        return valor
+
+    res = {"ok": True, "tela": "", "prints": "", "tipo": None, "erro": None, "linha": None, "testes": []}
+    velho_out, velho_err, velho_input = sys.stdout, sys.stderr, builtins.input
+    sys.stdout = saida
+    sys.stderr = saida
+    builtins.input = _input
+    ns = {"__name__": "__main__", "input": _input}
+    try:
+        try:
+            exec(str(codigo), ns)
+        except BaseException as e:
+            res["ok"] = False
+            res["tipo"] = type(e).__name__
+            res["erro"] = _mensagem(e)
+            res["linha"] = _linha(e, ns)
+        if res["ok"] and testes:
+            for caso in str(testes).split("\x02"):
+                cod, esperado_src = caso.split("\x01")
+                item = {"codigo": cod, "esperado": esperado_src, "obtido": None, "passou": False, "erro": None}
+                try:
+                    esperado = eval(esperado_src, {})
+                    item["esperado"] = repr(esperado)
+                    partes = cod.split("\n")
+                    local = dict(ns)
+                    if len(partes) > 1:
+                        exec("\n".join(partes[:-1]), local)
+                    obtido = eval(partes[-1], local)
+                    item["obtido"] = repr(obtido)
+                    item["passou"] = _igual(obtido, esperado)
+                except BaseException as e:
+                    item["erro"] = type(e).__name__ + ": " + _mensagem(e)
+                res["testes"].append(item)
+    finally:
+        sys.stdout, sys.stderr, builtins.input = velho_out, velho_err, velho_input
+    res["tela"] = "".join(saida.tela)
+    res["prints"] = "".join(saida.prints)
+    return json.dumps(res)
+
+
+window.pyRun = _rodar
+</script>
+
+<script>
+// ---------- Funções embutidas: [nome, assinatura, categoria, descrição, exemplo] ----------
+const BUILTINS = [
+  ["print", "print(*valores, sep=' ', end='\\n')", "Entrada e saída", "Mostra valores na tela.", "print('a', 1, sep='-')  # a-1"],
+  ["input", "input(mensagem='')", "Entrada e saída", "Lê uma linha digitada. Sempre devolve str.", "nome = input('Nome: ')"],
+  ["open", "open(arquivo, modo='r', encoding=None)", "Entrada e saída", "Abre um arquivo para ler ('r'), escrever ('w') ou acrescentar ('a').", "with open('a.txt', 'w') as f: f.write('oi')"],
+  ["int", "int(x, base=10)", "Conversão", "Converte para inteiro (corta as casas decimais).", "int('42') -> 42; int(3.9) -> 3; int('ff', 16) -> 255"],
+  ["float", "float(x)", "Conversão", "Converte para número real.", "float('7.5') -> 7.5"],
+  ["str", "str(x)", "Conversão", "Converte qualquer valor para texto.", "str(10) + ' anos' -> '10 anos'"],
+  ["bool", "bool(x)", "Conversão", "Converte para True/False. 0, '', [], None viram False.", "bool(0) -> False; bool('a') -> True"],
+  ["list", "list(iteravel)", "Conversão", "Cria uma lista a partir de outra sequência.", "list('abc') -> ['a', 'b', 'c']"],
+  ["tuple", "tuple(iteravel)", "Conversão", "Cria uma tupla (lista que não muda).", "tuple([1, 2]) -> (1, 2)"],
+  ["set", "set(iteravel)", "Conversão", "Cria um conjunto: sem repetidos e sem ordem.", "set([1, 1, 2]) -> {1, 2}"],
+  ["frozenset", "frozenset(iteravel)", "Conversão", "Conjunto imutável (pode ser chave de dicionário).", "frozenset({1, 2})"],
+  ["dict", "dict(**pares)", "Conversão", "Cria um dicionário.", "dict(nome='Ana', idade=17)"],
+  ["complex", "complex(real, imag)", "Conversão", "Cria um número complexo.", "complex(1, 2) -> (1+2j)"],
+  ["bytes", "bytes(x, encoding)", "Conversão", "Sequência imutável de bytes.", "bytes('oi', 'utf-8') -> b'oi'"],
+  ["bytearray", "bytearray(x)", "Conversão", "Sequência de bytes que pode ser alterada.", "bytearray(3) -> bytearray(b'\\x00\\x00\\x00')"],
+  ["bin", "bin(n)", "Conversão", "Texto do número em binário.", "bin(10) -> '0b1010'"],
+  ["oct", "oct(n)", "Conversão", "Texto do número em octal.", "oct(8) -> '0o10'"],
+  ["hex", "hex(n)", "Conversão", "Texto do número em hexadecimal.", "hex(255) -> '0xff'"],
+  ["chr", "chr(codigo)", "Conversão", "Caractere de um código Unicode.", "chr(65) -> 'A'"],
+  ["ord", "ord(caractere)", "Conversão", "Código Unicode de um caractere.", "ord('A') -> 65"],
+  ["ascii", "ascii(obj)", "Conversão", "Como repr(), mas troca acentos por códigos de escape.", "ascii('é') -> \"'\\\\xe9'\""],
+  ["repr", "repr(obj)", "Conversão", "Texto que representa o valor como no código (strings com aspas).", "repr('oi') -> \"'oi'\""],
+  ["format", "format(valor, especificacao)", "Conversão", "Formata um valor, igual ao que vai depois dos dois-pontos numa f-string.", "format(3.14159, '.2f') -> '3.14'"],
+  ["abs", "abs(x)", "Matemática", "Valor absoluto (sem sinal).", "abs(-7) -> 7"],
+  ["round", "round(x, casas=0)", "Matemática", "Arredonda. Empate vai para o par mais próximo.", "round(3.14159, 2) -> 3.14; round(2.5) -> 2"],
+  ["pow", "pow(base, exp, mod=None)", "Matemática", "Potência; com mod calcula o resto direto.", "pow(2, 10) -> 1024"],
+  ["divmod", "divmod(a, b)", "Matemática", "Devolve (a // b, a % b) de uma vez.", "divmod(17, 5) -> (3, 2)"],
+  ["sum", "sum(iteravel, inicio=0)", "Matemática", "Soma todos os itens.", "sum([1, 2, 3]) -> 6"],
+  ["max", "max(iteravel, key=None)", "Matemática", "Maior valor. Também aceita vários argumentos.", "max(3, 9, 2) -> 9; max(['ana', 'bia'], key=len)"],
+  ["min", "min(iteravel, key=None)", "Matemática", "Menor valor.", "min([4, 1, 7]) -> 1"],
+  ["len", "len(obj)", "Sequências", "Quantidade de itens (letras, elementos, chaves).", "len('python') -> 6"],
+  ["range", "range(inicio, fim, passo)", "Sequências", "Sequência de inteiros; o fim não entra.", "list(range(1, 10, 3)) -> [1, 4, 7]"],
+  ["sorted", "sorted(iteravel, key=None, reverse=False)", "Sequências", "Nova lista ordenada (não altera a original).", "sorted([3, 1, 2]) -> [1, 2, 3]"],
+  ["reversed", "reversed(seq)", "Sequências", "Percorre a sequência de trás para frente.", "list(reversed([1, 2, 3])) -> [3, 2, 1]"],
+  ["enumerate", "enumerate(iteravel, start=0)", "Sequências", "Gera pares (índice, valor).", "list(enumerate('ab')) -> [(0, 'a'), (1, 'b')]"],
+  ["zip", "zip(*iteraveis)", "Sequências", "Junta itens de mesma posição de várias sequências.", "list(zip([1, 2], 'ab')) -> [(1, 'a'), (2, 'b')]"],
+  ["map", "map(funcao, iteravel)", "Sequências", "Aplica a função em cada item.", "list(map(int, ['1', '2'])) -> [1, 2]"],
+  ["filter", "filter(funcao, iteravel)", "Sequências", "Mantém só os itens em que a função dá True.", "list(filter(lambda x: x > 0, [-1, 2])) -> [2]"],
+  ["all", "all(iteravel)", "Sequências", "True se todos os itens forem verdadeiros.", "all([1, True, 'a']) -> True"],
+  ["any", "any(iteravel)", "Sequências", "True se pelo menos um item for verdadeiro.", "any([0, '', 5]) -> True"],
+  ["slice", "slice(inicio, fim, passo)", "Sequências", "Objeto de fatia, igual a [inicio:fim:passo].", "'python'[slice(0, 2)] -> 'py'"],
+  ["iter", "iter(obj)", "Sequências", "Cria um iterador para percorrer item por item.", "it = iter([1, 2])"],
+  ["next", "next(iterador, padrao)", "Sequências", "Pega o próximo item de um iterador.", "next(iter([1, 2])) -> 1"],
+  ["aiter", "aiter(obj)", "Sequências", "Versão assíncrona de iter() (uso avançado).", "aiter(gerador_async)"],
+  ["anext", "anext(iterador)", "Sequências", "Versão assíncrona de next() (uso avançado).", "await anext(it)"],
+  ["type", "type(obj)", "Objetos e classes", "Mostra o tipo de um valor.", "type(3.0) -> <class 'float'>"],
+  ["isinstance", "isinstance(obj, tipo)", "Objetos e classes", "Testa se o valor é de um tipo.", "isinstance(5, int) -> True"],
+  ["issubclass", "issubclass(classe, outra)", "Objetos e classes", "Testa se uma classe herda de outra.", "issubclass(bool, int) -> True"],
+  ["id", "id(obj)", "Objetos e classes", "Número que identifica o objeto na memória.", "id(x)"],
+  ["hash", "hash(obj)", "Objetos e classes", "Número de hash (usado por dict e set).", "hash('a')"],
+  ["callable", "callable(obj)", "Objetos e classes", "True se dá para chamar com ().", "callable(print) -> True"],
+  ["dir", "dir(obj)", "Objetos e classes", "Lista os atributos e métodos de um objeto.", "dir(str)"],
+  ["help", "help(obj)", "Objetos e classes", "Mostra a documentação.", "help(len)"],
+  ["vars", "vars(obj)", "Objetos e classes", "Dicionário com os atributos de um objeto.", "vars(conta)"],
+  ["getattr", "getattr(obj, nome, padrao)", "Objetos e classes", "Lê um atributo pelo nome em texto.", "getattr(conta, 'saldo')"],
+  ["setattr", "setattr(obj, nome, valor)", "Objetos e classes", "Altera um atributo pelo nome.", "setattr(conta, 'saldo', 0)"],
+  ["hasattr", "hasattr(obj, nome)", "Objetos e classes", "True se o atributo existe.", "hasattr('a', 'upper') -> True"],
+  ["delattr", "delattr(obj, nome)", "Objetos e classes", "Apaga um atributo.", "delattr(conta, 'apelido')"],
+  ["object", "object()", "Objetos e classes", "A classe base de todas as classes.", "class A(object): pass"],
+  ["super", "super()", "Objetos e classes", "Acessa a classe mãe dentro de uma classe filha.", "super().__init__(nome)"],
+  ["property", "@property", "Objetos e classes", "Transforma um método em atributo calculado.", "@property\ndef area(self): ..."],
+  ["staticmethod", "@staticmethod", "Objetos e classes", "Método que não recebe self.", "@staticmethod\ndef validar(x): ..."],
+  ["classmethod", "@classmethod", "Objetos e classes", "Método que recebe a classe (cls) em vez do objeto.", "@classmethod\ndef criar(cls): ..."],
+  ["memoryview", "memoryview(obj)", "Objetos e classes", "Acessa bytes sem copiar (uso avançado).", "memoryview(b'abc')[0] -> 97"],
+  ["eval", "eval(expressao)", "Avançado", "Calcula uma expressão escrita em texto. Cuidado com entradas do usuário.", "eval('2 + 3') -> 5"],
+  ["exec", "exec(codigo)", "Avançado", "Executa código escrito em texto.", "exec('x = 5')"],
+  ["compile", "compile(fonte, arquivo, modo)", "Avançado", "Prepara código-texto para eval/exec.", "compile('1+1', '', 'eval')"],
+  ["globals", "globals()", "Avançado", "Dicionário com as variáveis globais.", "globals()['x']"],
+  ["locals", "locals()", "Avançado", "Dicionário com as variáveis locais.", "locals()"],
+  ["breakpoint", "breakpoint()", "Avançado", "Pausa o programa no depurador (no computador).", "breakpoint()"],
+  ["__import__", "__import__(nome)", "Avançado", "Importa um módulo pelo nome (prefira import).", "__import__('math').sqrt(4)"],
+];
+
+// ---------- Métodos: [tipo, nome, assinatura, descrição, exemplo] ----------
+const METODOS = [
+  ["str", "upper", "s.upper()", "Tudo em maiúsculas.", "'ana'.upper() -> 'ANA'"],
+  ["str", "lower", "s.lower()", "Tudo em minúsculas.", "'ANA'.lower() -> 'ana'"],
+  ["str", "capitalize", "s.capitalize()", "Primeira letra maiúscula, resto minúsculo.", "'pYTHON'.capitalize() -> 'Python'"],
+  ["str", "title", "s.title()", "Primeira letra de cada palavra maiúscula.", "'joão da silva'.title() -> 'João Da Silva'"],
+  ["str", "swapcase", "s.swapcase()", "Inverte maiúsculas e minúsculas.", "'AbC'.swapcase() -> 'aBc'"],
+  ["str", "strip", "s.strip(chars)", "Remove espaços (ou chars) das duas pontas.", "'  oi  '.strip() -> 'oi'"],
+  ["str", "lstrip / rstrip", "s.lstrip() / s.rstrip()", "Remove só da esquerda / da direita.", "'00042'.lstrip('0') -> '42'"],
+  ["str", "split", "s.split(sep=None)", "Quebra em lista. Sem argumento, separa por espaços.", "'a,b,c'.split(',') -> ['a', 'b', 'c']"],
+  ["str", "splitlines", "s.splitlines()", "Quebra nas quebras de linha.", "'a\\nb'.splitlines() -> ['a', 'b']"],
+  ["str", "join", "sep.join(lista)", "Junta uma lista de textos usando o separador.", "', '.join(['a', 'b']) -> 'a, b'"],
+  ["str", "replace", "s.replace(velho, novo)", "Troca todas as ocorrências.", "'1.5'.replace('.', ',') -> '1,5'"],
+  ["str", "find", "s.find(sub)", "Posição da primeira ocorrência, ou -1.", "'banana'.find('n') -> 2"],
+  ["str", "index", "s.index(sub)", "Como find, mas dá erro se não achar.", "'banana'.index('a') -> 1"],
+  ["str", "count", "s.count(sub)", "Quantas vezes aparece.", "'banana'.count('a') -> 3"],
+  ["str", "startswith", "s.startswith(prefixo)", "Começa com?", "'Ana'.startswith('A') -> True"],
+  ["str", "endswith", "s.endswith(sufixo)", "Termina com?", "'foto.png'.endswith('.png') -> True"],
+  ["str", "isdigit", "s.isdigit()", "Só dígitos?", "'123'.isdigit() -> True"],
+  ["str", "isalpha", "s.isalpha()", "Só letras?", "'abc'.isalpha() -> True"],
+  ["str", "isalnum", "s.isalnum()", "Só letras e dígitos?", "'abc1'.isalnum() -> True"],
+  ["str", "isupper / islower", "s.isupper() / s.islower()", "Tudo maiúsculo / minúsculo?", "'ABC'.isupper() -> True"],
+  ["str", "isspace", "s.isspace()", "Só espaços?", "'  '.isspace() -> True"],
+  ["str", "center", "s.center(largura, char)", "Centraliza preenchendo dos lados.", "'oi'.center(6, '*') -> '**oi**'"],
+  ["str", "ljust / rjust", "s.ljust(n) / s.rjust(n)", "Alinha à esquerda / direita.", "'7'.rjust(3, '0') -> '007'"],
+  ["str", "zfill", "s.zfill(n)", "Completa com zeros à esquerda.", "'42'.zfill(5) -> '00042'"],
+  ["str", "partition", "s.partition(sep)", "Divide em (antes, sep, depois).", "'a=b'.partition('=') -> ('a', '=', 'b')"],
+  ["str", "format", "s.format(*valores)", "Substitui {} pelos valores (alternativa à f-string).", "'{} + {}'.format(1, 2) -> '1 + 2'"],
+  ["list", "append", "v.append(x)", "Adiciona x no fim.", "v = [1]; v.append(2) -> [1, 2]"],
+  ["list", "extend", "v.extend(outra)", "Adiciona todos os itens de outra lista.", "[1].extend([2, 3]) -> [1, 2, 3]"],
+  ["list", "insert", "v.insert(i, x)", "Insere x na posição i.", "[1, 3].insert(1, 2) -> [1, 2, 3]"],
+  ["list", "remove", "v.remove(x)", "Remove a primeira ocorrência de x (erro se não existir).", "[1, 2, 1].remove(1) -> [2, 1]"],
+  ["list", "pop", "v.pop(i=-1)", "Remove e devolve o item da posição i (padrão: último).", "[1, 2, 3].pop() -> 3"],
+  ["list", "clear", "v.clear()", "Esvazia a lista.", "v.clear() -> []"],
+  ["list", "index", "v.index(x)", "Posição da primeira ocorrência.", "[5, 7].index(7) -> 1"],
+  ["list", "count", "v.count(x)", "Quantas vezes x aparece.", "[1, 1, 2].count(1) -> 2"],
+  ["list", "sort", "v.sort(key=None, reverse=False)", "Ordena a própria lista (não devolve nada).", "v = [3, 1]; v.sort() -> [1, 3]"],
+  ["list", "reverse", "v.reverse()", "Inverte a própria lista.", "[1, 2].reverse() -> [2, 1]"],
+  ["list", "copy", "v.copy()", "Cópia rasa da lista (mesmo que v[:]).", "w = v.copy()"],
+  ["dict", "get", "d.get(chave, padrao=None)", "Valor da chave, ou o padrão se não existir.", "{'a': 1}.get('b', 0) -> 0"],
+  ["dict", "keys", "d.keys()", "Todas as chaves.", "list({'a': 1}.keys()) -> ['a']"],
+  ["dict", "values", "d.values()", "Todos os valores.", "sum({'a': 1, 'b': 2}.values()) -> 3"],
+  ["dict", "items", "d.items()", "Pares (chave, valor) para usar no for.", "for k, v in d.items(): ..."],
+  ["dict", "update", "d.update(outro)", "Copia os pares de outro dicionário.", "d.update({'b': 2})"],
+  ["dict", "pop", "d.pop(chave, padrao)", "Remove a chave e devolve o valor.", "{'a': 1}.pop('a') -> 1"],
+  ["dict", "popitem", "d.popitem()", "Remove e devolve o último par inserido.", "{'a': 1}.popitem() -> ('a', 1)"],
+  ["dict", "setdefault", "d.setdefault(chave, padrao)", "Devolve o valor; se não existir, cria com o padrão.", "d.setdefault('lista', []).append(1)"],
+  ["dict", "fromkeys", "dict.fromkeys(chaves, valor)", "Cria dicionário com as chaves e um valor inicial.", "dict.fromkeys('aei', 0) -> {'a': 0, 'e': 0, 'i': 0}"],
+  ["dict", "clear / copy", "d.clear() / d.copy()", "Esvazia / copia.", "d2 = d.copy()"],
+  ["set", "add", "s.add(x)", "Adiciona um elemento.", "{1}.add(2) -> {1, 2}"],
+  ["set", "remove", "s.remove(x)", "Remove (erro se não existir).", "{1, 2}.remove(1) -> {2}"],
+  ["set", "discard", "s.discard(x)", "Remove se existir (sem erro).", "{1}.discard(9) -> {1}"],
+  ["set", "pop", "s.pop()", "Remove e devolve um elemento qualquer.", "{5}.pop() -> 5"],
+  ["set", "union", "a.union(b)  ou  a | b", "Tudo que está em a ou b.", "{1, 2} | {2, 3} -> {1, 2, 3}"],
+  ["set", "intersection", "a.intersection(b)  ou  a & b", "O que está nos dois.", "{1, 2} & {2, 3} -> {2}"],
+  ["set", "difference", "a.difference(b)  ou  a - b", "Está em a mas não em b.", "{1, 2} - {2} -> {1}"],
+  ["set", "symmetric_difference", "a ^ b", "Está em um só dos dois.", "{1, 2} ^ {2, 3} -> {1, 3}"],
+  ["set", "issubset / issuperset", "a <= b / a >= b", "Está contido / contém.", "{1} <= {1, 2} -> True"],
+];
+
+// ---------- Receitas: moldes de programa ----------
+const RECEITAS = [
+  { t: "Programa sequencial (entrada → cálculo → saída)", cat: "Sequência", d: "Molde dos exercícios 33 a 71. Troque as entradas, a fórmula e a mensagem.", stdin: "3|4",
+    c: `# 1. ENTRADA: leia e converta cada dado
+base = float(input("Base: "))
+altura = float(input("Altura: "))
+
+# 2. PROCESSAMENTO: a fórmula do enunciado
+area = base * altura
+
+# 3. SAÍDA: mostre com uma mensagem clara
+print(f"Área do retângulo: {area:.2f}")` },
+  { t: "Decisão com faixas de valores (tabela)", cat: "Seleção", d: "Para tabelas de desconto, conceito, IMC, multa. Teste do menor limite para o maior.", stdin: "7.8",
+    c: `media = float(input("Média final: "))
+
+if media >= 8:
+    conceito = "A"
+elif media >= 5:        # já sabemos que é < 8
+    conceito = "B"
+else:
+    conceito = "C"
+
+print("Conceito:", conceito)` },
+  { t: "Menu com escolha", cat: "Múltipla escolha", d: "Para cardápios, códigos e menus. O case _ trata opção inválida.", stdin: "2",
+    c: `print("1 - Triângulo  2 - Círculo  3 - Sair")
+opcao = input("Opção: ")
+
+match opcao:
+    case "1":
+        b = float(input("Base: ")); h = float(input("Altura: "))
+        print("Área:", b * h / 2)
+    case "2":
+        r = 3
+        print("Área do círculo de raio 3:", 3.14159 * r ** 2)
+    case "3":
+        print("Saindo")
+    case _:
+        print("Opção inválida")` },
+  { t: "Laço com quantidade conhecida (para N vezes)", cat: "Repetição", d: "Ler N valores e calcular soma, média, maior e menor ao mesmo tempo.", stdin: "4|7|2|9|5",
+    c: `n = int(input("Quantos valores? "))
+soma = 0
+maior = None
+menor = None
+
+for i in range(n):
+    x = float(input(f"Valor {i + 1}: "))
+    soma += x
+    if maior is None or x > maior:
+        maior = x
+    if menor is None or x < menor:
+        menor = x
+
+print("Soma:", soma)
+print("Média:", soma / n)
+print("Maior:", maior, "Menor:", menor)` },
+  { t: "Laço com flag (até digitar 0)", cat: "Repetição", d: "Quando não se sabe quantos dados virão. Leia antes do laço e no fim de cada volta.", stdin: "25|17|40|0",
+    c: `quantidade = 0
+soma = 0
+idade = int(input("Idade (0 encerra): "))
+
+while idade != 0:
+    quantidade += 1
+    soma += idade
+    idade = int(input("Idade (0 encerra): "))
+
+if quantidade > 0:
+    print("Pessoas:", quantidade, "Média:", soma / quantidade)` },
+  { t: "Laço com pergunta 'Deseja continuar? (S/N)'", cat: "Repetição", d: "Exercício 176 e parecidos.", stdin: "10|S|25.5|N",
+    c: `total = 0
+quantidade = 0
+while True:
+    valor = float(input("Valor da mercadoria: "))
+    total += valor
+    quantidade += 1
+    resposta = input("MAIS MERCADORIAS (S/N)? ").strip().upper()
+    if resposta != "S":
+        break
+
+print(f"Total em estoque: R$ {total:.2f}")
+print(f"Média: R$ {total / quantidade:.2f}")` },
+  { t: "Contadores e porcentagens de pesquisa", cat: "Repetição", d: "Pesquisas com sexo/resposta (exercícios 149, 172, 177). Um contador para cada grupo.", stdin: "3|F|S|M|N|F|N",
+    c: `n = int(input("Entrevistados: "))
+sim = nao = mulheres = mulheres_sim = 0
+
+for _ in range(n):
+    sexo = input("Sexo (M/F): ").upper()
+    resp = input("Gostou (S/N): ").upper()
+    if resp == "S":
+        sim += 1
+    else:
+        nao += 1
+    if sexo == "F":
+        mulheres += 1
+        if resp == "S":
+            mulheres_sim += 1
+
+print("Sim:", sim, "Não:", nao)
+print(f"Mulheres: {mulheres / n * 100:.1f}%")
+if mulheres > 0:
+    print(f"Mulheres que disseram sim: {mulheres_sim / mulheres * 100:.1f}%")` },
+  { t: "Ler e processar um vetor", cat: "Vetor e matriz", d: "Guardar primeiro, processar depois: necessário quando a conta depende de todos (ex.: 'maiores que a média').", stdin: "5|4|8|6|10|7",
+    c: `n = int(input("Tamanho: "))
+v = []
+for i in range(n):
+    v.append(float(input(f"v[{i}]: ")))
+
+media = sum(v) / len(v)
+acima = [x for x in v if x > media]
+print("Média:", media)
+print("Acima da média:", acima)
+print("Maior:", max(v), "na posição", v.index(max(v)))` },
+  { t: "Percorrer uma matriz", cat: "Vetor e matriz", d: "Dois for: o de fora anda nas linhas, o de dentro nas colunas.",
+    c: `m = [[3, 8, 1],
+     [7, 2, 9],
+     [4, 6, 5]]
+
+soma = 0
+maior = m[0][0]
+for i in range(len(m)):
+    for j in range(len(m[i])):
+        soma += m[i][j]
+        if m[i][j] > maior:
+            maior = m[i][j]
+        if i == j:
+            print("diagonal:", m[i][j])
+
+print("Soma:", soma, "Maior:", maior)` },
+  { t: "Cadastro com lista de registros", cat: "Registros", d: "Lista de dicionários: cada item é uma 'ficha'.", stdin: "2|Ana|17|Bruno|30",
+    c: `pessoas = []
+n = int(input("Quantas pessoas? "))
+for _ in range(n):
+    nome = input("Nome: ")
+    idade = int(input("Idade: "))
+    pessoas.append({"nome": nome, "idade": idade})
+
+for p in pessoas:
+    print(f"{p['nome']:<10} {p['idade']:>3} anos")
+
+mais_velha = max(pessoas, key=lambda p: p["idade"])
+print("Mais velha:", mais_velha["nome"])` },
+  { t: "Programa dividido em funções", cat: "Funções", d: "Funções pequenas que retornam valores + um main() que conversa com o usuário.", stdin: "2024",
+    c: `def eh_bissexto(ano):
+    return ano % 4 == 0 and (ano % 100 != 0 or ano % 400 == 0)
+
+def descrever(ano):
+    return f"{ano} {'é' if eh_bissexto(ano) else 'não é'} bissexto"
+
+def main():
+    ano = int(input("Ano: "))
+    print(descrever(ano))
+
+main()` },
+  { t: "Ler número com validação", cat: "Funções", d: "Repete até o usuário digitar um número válido dentro da faixa.", stdin: "abc|15|7",
+    c: `def ler_inteiro(msg, minimo, maximo):
+    while True:
+        texto = input(msg)
+        if not texto.lstrip("-").isdigit():
+            print("Digite um número inteiro.")
+        elif not (minimo <= int(texto) <= maximo):
+            print(f"Digite entre {minimo} e {maximo}.")
+        else:
+            return int(texto)
+
+mes = ler_inteiro("Mês (1-12): ", 1, 12)
+print("Mês escolhido:", mes)` },
+  { t: "Separar dígitos de um número", cat: "Sequência", d: "% 10 pega o último dígito; // 10 remove o último dígito.", stdin: "4827",
+    c: `num = int(input("Número: "))
+soma_digitos = 0
+while num > 0:
+    digito = num % 10
+    print("dígito:", digito)
+    soma_digitos += digito
+    num //= 10
+print("Soma dos dígitos:", soma_digitos)` },
+];
+
+// ---------- Exercícios com correção ----------
+// testes: [chamada, esperado] avaliados em Python. Se a chamada tiver várias linhas, a última é a expressão testada.
+// io: [entrada, [trechos que a saída precisa conter]] (comparação sem espaços e sem diferenciar maiúsculas).
+function stub(fn, args, call, expect) {
+  return `def ${fn}(${args}):\n    # escreva seu código aqui\n    pass\n\n\nprint(${call})  # teste rápido: deve mostrar ${expect}\n`;
+}
+const EXERCICIOS = [
+  // ===== SEQUÊNCIA =====
+  { id: "e33", n: "33", cap: "Sequência", lv: 1, t: "Soma de dois inteiros", fn: "soma",
+    enun: "<p>Escreva a função <code>soma(a, b)</code> que <b>retorna</b> a soma de dois números.</p><p>Exemplo: <code>soma(2, 3)</code> → <code>5</code></p>",
+    ini: stub("soma", "a, b", "soma(2, 3)", "5"),
+    dica: "Uma linha só: return a + b.",
+    sol: "def soma(a, b):\n    return a + b",
+    testes: [["soma(2, 3)", "5"], ["soma(-4, 10)", "6"], ["soma(0, 0)", "0"]] },
+  { id: "e34", n: "34", cap: "Sequência", lv: 1, t: "Dobro (programa com input)",
+    enun: "<p>Faça um <b>programa</b> que leia um número inteiro com <code>input()</code> e mostre o dobro dele com <code>print()</code>.</p><p>Entrada <code>7</code> → a saída deve conter <code>14</code>.</p>",
+    ini: "n = int(input(\"Número: \"))\n# calcule e mostre o dobro\n", stdin: "7",
+    dica: "Multiplique n por 2 e passe o resultado para print.",
+    sol: "n = int(input(\"Número: \"))\nprint(\"Dobro:\", n * 2)",
+    io: [["7", ["14"]], ["25", ["50"]], ["-3", ["-6"]]] },
+  { id: "e35", n: "35", cap: "Sequência", lv: 1, t: "Área do retângulo", fn: "area_retangulo",
+    enun: "<p><code>area_retangulo(base, altura)</code> retorna a área (base × altura).</p>",
+    ini: stub("area_retangulo", "base, altura", "area_retangulo(3, 4)", "12"),
+    dica: "return base * altura",
+    sol: "def area_retangulo(base, altura):\n    return base * altura",
+    testes: [["area_retangulo(3, 4)", "12"], ["area_retangulo(2.5, 2)", "5.0"], ["area_retangulo(10, 0)", "0"]] },
+  { id: "e36", n: "36", cap: "Sequência", lv: 1, t: "Hipotenusa", fn: "hipotenusa",
+    enun: "<p><code>hipotenusa(a, b)</code> recebe os catetos de um triângulo retângulo e retorna a hipotenusa: √(a² + b²).</p>",
+    ini: "import math\n\n" + stub("hipotenusa", "a, b", "hipotenusa(3, 4)", "5.0"),
+    dica: "Use math.sqrt(a ** 2 + b ** 2). Ou eleve a 0.5.",
+    sol: "import math\n\ndef hipotenusa(a, b):\n    return math.sqrt(a ** 2 + b ** 2)",
+    testes: [["hipotenusa(3, 4)", "5.0"], ["hipotenusa(5, 12)", "13.0"], ["hipotenusa(1, 1)", "1.4142135623730951"]] },
+  { id: "e39", n: "39", cap: "Sequência", lv: 1, t: "Idade em dias", fn: "idade_em_dias",
+    enun: "<p><code>idade_em_dias(anos, meses, dias)</code> retorna a idade só em dias. Considere ano com 365 dias e mês com 30.</p>",
+    ini: stub("idade_em_dias", "anos, meses, dias", "idade_em_dias(1, 0, 0)", "365"),
+    dica: "anos * 365 + meses * 30 + dias",
+    sol: "def idade_em_dias(anos, meses, dias):\n    return anos * 365 + meses * 30 + dias",
+    testes: [["idade_em_dias(1, 0, 0)", "365"], ["idade_em_dias(17, 3, 10)", "6305"], ["idade_em_dias(0, 2, 5)", "65"]] },
+  { id: "e41", n: "41", cap: "Sequência", lv: 1, t: "Trocar A e B", fn: "trocar",
+    enun: "<p><code>trocar(a, b)</code> retorna os dois valores trocados, como uma tupla <code>(b, a)</code>. Tente fazer com uma variável auxiliar, como no Portugol.</p>",
+    ini: stub("trocar", "a, b", "trocar(1, 2)", "(2, 1)"),
+    dica: "aux = a; a = b; b = aux; return a, b",
+    sol: "def trocar(a, b):\n    aux = a\n    a = b\n    b = aux\n    return a, b",
+    testes: [["trocar(1, 2)", "(2, 1)"], ["trocar('x', 'y')", "('y', 'x')"], ["trocar(5, 5)", "(5, 5)"]] },
+  { id: "e45", n: "45", cap: "Sequência", lv: 1, t: "Divisão inteira e resto", fn: "divisao_inteira",
+    enun: "<p><code>divisao_inteira(a, b)</code> retorna a tupla <code>(quociente, resto)</code> da divisão inteira de a por b.</p>",
+    ini: stub("divisao_inteira", "a, b", "divisao_inteira(17, 5)", "(3, 2)"),
+    dica: "Quociente com //, resto com %.",
+    sol: "def divisao_inteira(a, b):\n    return a // b, a % b",
+    testes: [["divisao_inteira(17, 5)", "(3, 2)"], ["divisao_inteira(10, 2)", "(5, 0)"], ["divisao_inteira(7, 9)", "(0, 7)"]] },
+  { id: "e47", n: "47", cap: "Sequência", lv: 1, t: "Aumento de 22%", fn: "salario_com_aumento",
+    enun: "<p><code>salario_com_aumento(salario)</code> retorna o salário depois de um aumento de 22%.</p>",
+    ini: stub("salario_com_aumento", "salario", "salario_com_aumento(1000)", "1220.0"),
+    dica: "Aumentar 22% é multiplicar por 1.22.",
+    sol: "def salario_com_aumento(salario):\n    return salario * 1.22",
+    testes: [["salario_com_aumento(1000)", "1220.0"], ["salario_com_aumento(2500)", "3050.0"], ["salario_com_aumento(0)", "0.0"]] },
+  { id: "e52", n: "52", cap: "Sequência", lv: 1, t: "Custo do carro ao consumidor", fn: "custo_consumidor",
+    enun: "<p>O custo ao consumidor é o custo de fábrica + 28% do distribuidor + 45% de impostos (os dois percentuais sobre o custo de fábrica). <code>custo_consumidor(custo_fabrica)</code> retorna o custo final.</p>",
+    ini: stub("custo_consumidor", "custo_fabrica", "custo_consumidor(10000)", "17300.0"),
+    dica: "custo + custo * 0.28 + custo * 0.45",
+    sol: "def custo_consumidor(custo_fabrica):\n    distribuidor = custo_fabrica * 0.28\n    impostos = custo_fabrica * 0.45\n    return custo_fabrica + distribuidor + impostos",
+    testes: [["custo_consumidor(10000)", "17300.0"], ["custo_consumidor(50000)", "86500.0"]] },
+  { id: "e54", n: "54", cap: "Sequência", lv: 1, t: "Média ponderada 2, 3, 5", fn: "media_ponderada",
+    enun: "<p><code>media_ponderada(n1, n2, n3)</code> retorna (n1×2 + n2×3 + n3×5) / 10.</p>",
+    ini: stub("media_ponderada", "n1, n2, n3", "media_ponderada(5, 6, 8)", "6.8"),
+    dica: "Cuidado com os parênteses: a soma inteira é dividida por 10.",
+    sol: "def media_ponderada(n1, n2, n3):\n    return (n1 * 2 + n2 * 3 + n3 * 5) / 10",
+    testes: [["media_ponderada(10, 10, 10)", "10.0"], ["media_ponderada(5, 6, 8)", "6.8"], ["media_ponderada(0, 0, 10)", "5.0"]] },
+  { id: "e60", n: "60", cap: "Sequência", lv: 2, t: "Gasto do fumante", fn: "gasto_fumante",
+    enun: "<p><code>gasto_fumante(anos, cigarros_por_dia, preco_carteira)</code>: quanto dinheiro foi gasto? Uma carteira tem 20 cigarros e o ano tem 365 dias.</p>",
+    ini: stub("gasto_fumante", "anos, cigarros_por_dia, preco_carteira", "gasto_fumante(10, 20, 10)", "36500.0"),
+    dica: "Total de cigarros = anos × 365 × cigarros_por_dia. Carteiras = cigarros / 20.",
+    sol: "def gasto_fumante(anos, cigarros_por_dia, preco_carteira):\n    cigarros = anos * 365 * cigarros_por_dia\n    carteiras = cigarros / 20\n    return carteiras * preco_carteira",
+    testes: [["gasto_fumante(10, 20, 10)", "36500.0"], ["gasto_fumante(1, 10, 8)", "1460.0"]] },
+  { id: "e65", n: "65", cap: "Sequência", lv: 2, t: "Quantos azulejos?", fn: "azulejos",
+    enun: "<p><code>azulejos(ap, lp, aa, la)</code> recebe altura e largura da parede e do azulejo (em metros) e retorna quantos azulejos inteiros são necessários. Azulejo não se compra pela metade: arredonde <b>para cima</b>.</p>",
+    ini: "import math\n\n" + stub("azulejos", "ap, lp, aa, la", "azulejos(2.5, 3, 0.5, 0.5)", "30"),
+    dica: "Área da parede / área do azulejo, depois math.ceil().",
+    sol: "import math\n\ndef azulejos(ap, lp, aa, la):\n    return math.ceil((ap * lp) / (aa * la))",
+    testes: [["azulejos(2.5, 3, 0.5, 0.5)", "30"], ["azulejos(3, 2.1, 0.5, 0.5)", "26"], ["azulejos(1, 1, 0.3, 0.3)", "12"]] },
+  { id: "e66", n: "66", cap: "Sequência", lv: 1, t: "IMC", fn: "imc",
+    enun: "<p><code>imc(massa, altura)</code> retorna massa / altura².</p>",
+    ini: stub("imc", "massa, altura", "imc(70, 1.75)", "22.857142857142858"),
+    dica: "altura ** 2",
+    sol: "def imc(massa, altura):\n    return massa / altura ** 2",
+    testes: [["imc(70, 1.75)", "22.857142857142858"], ["imc(90, 1.8)", "27.777777777777775"]] },
+
+  // ===== SELEÇÃO =====
+  { id: "e72", n: "72", cap: "Seleção", lv: 1, t: "Só se for maior que 100", fn: "maior_que_100",
+    enun: "<p><code>maior_que_100(n)</code> retorna o próprio n se ele for maior que 100; caso contrário retorna 0.</p>",
+    ini: stub("maior_que_100", "n", "maior_que_100(150)", "150"),
+    dica: "if n > 100: return n / else: return 0",
+    sol: "def maior_que_100(n):\n    if n > 100:\n        return n\n    return 0",
+    testes: [["maior_que_100(150)", "150"], ["maior_que_100(100)", "0"], ["maior_que_100(-5)", "0"]] },
+  { id: "e75", n: "75", cap: "Seleção", lv: 1, t: "O maior de dois", fn: "maior",
+    enun: "<p><code>maior(a, b)</code> retorna o maior dos dois números, <b>sem usar max()</b>.</p>",
+    ini: stub("maior", "a, b", "maior(3, 9)", "9"),
+    dica: "Compare a > b.",
+    sol: "def maior(a, b):\n    if a > b:\n        return a\n    return b",
+    testes: [["maior(3, 9)", "9"], ["maior(9, 3)", "9"], ["maior(-1, -5)", "-1"], ["maior(4, 4)", "4"]] },
+  { id: "e76", n: "76", cap: "Seleção", lv: 1, t: "Peso ideal", fn: "peso_ideal",
+    enun: "<p><code>peso_ideal(altura, sexo)</code> com sexo <code>'M'</code> ou <code>'F'</code>.</p><ul><li>Homens: (72.7 × h) − 58</li><li>Mulheres: (62.1 × h) − 44.7</li></ul>",
+    ini: stub("peso_ideal", "altura, sexo", "peso_ideal(1.80, 'M')", "72.86"),
+    dica: "if sexo == 'M': ... else: ...",
+    sol: "def peso_ideal(altura, sexo):\n    if sexo == 'M':\n        return 72.7 * altura - 58\n    return 62.1 * altura - 44.7",
+    testes: [["peso_ideal(1.80, 'M')", "72.86"], ["peso_ideal(1.60, 'F')", "54.66"], ["peso_ideal(1.70, 'F')", "60.87"]] },
+  { id: "e77", n: "77", cap: "Seleção", lv: 2, t: "Conta de energia com ICMS", fn: "conta_energia",
+    enun: "<p>Preço do kWh conforme o consumo: até 100 → 0,08; 101 a 200 → 0,10; 201 a 500 → 0,12; acima → 0,15. Sobre o valor soma-se 18% de ICMS. <code>conta_energia(kwh)</code> retorna o <b>total</b> a pagar.</p>",
+    ini: stub("conta_energia", "kwh", "conta_energia(150)", "17.7"),
+    dica: "Escolha a tarifa com if/elif, calcule consumo = kwh * tarifa e retorne consumo * 1.18.",
+    sol: "def conta_energia(kwh):\n    if kwh <= 100:\n        tarifa = 0.08\n    elif kwh <= 200:\n        tarifa = 0.10\n    elif kwh <= 500:\n        tarifa = 0.12\n    else:\n        tarifa = 0.15\n    consumo = kwh * tarifa\n    icms = consumo * 0.18\n    return consumo + icms",
+    testes: [["conta_energia(100)", "9.44"], ["conta_energia(150)", "17.7"], ["conta_energia(300)", "42.48"], ["conta_energia(600)", "106.2"]] },
+  { id: "e78", n: "78", cap: "Seleção", lv: 1, t: "Pode votar?", fn: "pode_votar",
+    enun: "<p><code>pode_votar(ano_atual, ano_nascimento)</code> retorna <code>True</code> se a pessoa tem 16 anos ou mais (ignore o mês).</p>",
+    ini: stub("pode_votar", "ano_atual, ano_nascimento", "pode_votar(2026, 2010)", "True"),
+    dica: "A comparação já é True/False: return ano_atual - ano_nascimento >= 16",
+    sol: "def pode_votar(ano_atual, ano_nascimento):\n    return ano_atual - ano_nascimento >= 16",
+    testes: [["pode_votar(2026, 2010)", "True"], ["pode_votar(2026, 2011)", "False"], ["pode_votar(2026, 1950)", "True"]] },
+  { id: "e81", n: "81", cap: "Seleção", lv: 2, t: "Comissão em duas faixas", fn: "salario_total",
+    enun: "<p>O vendedor recebe o fixo + 3% sobre as vendas até R$ 1.500,00 + 5% sobre o que passar disso. <code>salario_total(fixo, vendas)</code> retorna o salário.</p>",
+    ini: stub("salario_total", "fixo, vendas", "salario_total(1000, 3500)", "1145.0"),
+    dica: "Se vendas <= 1500: comissão = vendas * 0.03. Senão: 1500 * 0.03 + (vendas - 1500) * 0.05.",
+    sol: "def salario_total(fixo, vendas):\n    if vendas <= 1500:\n        comissao = vendas * 0.03\n    else:\n        comissao = 1500 * 0.03 + (vendas - 1500) * 0.05\n    return fixo + comissao",
+    testes: [["salario_total(1000, 1000)", "1030.0"], ["salario_total(1000, 1500)", "1045.0"], ["salario_total(1000, 3500)", "1145.0"], ["salario_total(800, 0)", "800.0"]] },
+  { id: "e83", n: "83", cap: "Seleção", lv: 2, t: "Desconto por quantidade", fn: "compra",
+    enun: "<p><code>compra(quantidade, preco_unitario)</code> retorna a tupla <code>(total, desconto, total_a_pagar)</code>. Desconto: até 5 unidades 2%; de 6 a 10, 3%; acima de 10, 5%.</p>",
+    ini: stub("compra", "quantidade, preco_unitario", "compra(10, 10)", "(100, 3.0, 97.0)"),
+    dica: "total = quantidade * preco; escolha o percentual; desconto = total * percentual.",
+    sol: "def compra(quantidade, preco_unitario):\n    total = quantidade * preco_unitario\n    if quantidade <= 5:\n        perc = 0.02\n    elif quantidade <= 10:\n        perc = 0.03\n    else:\n        perc = 0.05\n    desconto = total * perc\n    return total, desconto, total - desconto",
+    testes: [["compra(5, 10)", "(50, 1.0, 49.0)"], ["compra(10, 10)", "(100, 3.0, 97.0)"], ["compra(20, 2.5)", "(50.0, 2.5, 47.5)"]] },
+  { id: "e89", n: "89", cap: "Seleção", lv: 1, t: "Resultado do jogo", fn: "resultado_jogo",
+    enun: "<p><code>resultado_jogo(gols1, gols2)</code> retorna <code>'Empate'</code>, <code>'Vitória do time 1'</code> ou <code>'Vitória do time 2'</code>.</p>",
+    ini: stub("resultado_jogo", "gols1, gols2", "resultado_jogo(3, 1)", "Vitória do time 1"),
+    dica: "Três casos: ==, >, senão.",
+    sol: "def resultado_jogo(gols1, gols2):\n    if gols1 == gols2:\n        return 'Empate'\n    elif gols1 > gols2:\n        return 'Vitória do time 1'\n    return 'Vitória do time 2'",
+    testes: [["resultado_jogo(2, 2)", "'Empate'"], ["resultado_jogo(3, 1)", "'Vitória do time 1'"], ["resultado_jogo(0, 2)", "'Vitória do time 2'"]] },
+  { id: "e91", n: "91", cap: "Seleção", lv: 3, t: "Bolão de futebol", fn: "pontos_bolao",
+    enun: "<p><code>pontos_bolao(aposta1, aposta2, real1, real2)</code>. O apostador ganha 10 pontos se acertar o resultado (quem venceu, ou empate) e mais 5 pontos para cada placar de time que acertar.</p><p>Jogo 3×2: aposta 0×1 → 0; 0×2 → 5; 3×5 → 5; 1×0 → 10; 3×2 → 20.</p>",
+    ini: stub("pontos_bolao", "aposta1, aposta2, real1, real2", "pontos_bolao(3, 2, 3, 2)", "20"),
+    dica: "Crie uma função auxiliar que devolve o 'resultado' de um placar (1, 2 ou 0 para empate) e compare os resultados. Depois some 5 para cada placar igual.",
+    sol: "def resultado(a, b):\n    if a > b:\n        return 1\n    if b > a:\n        return 2\n    return 0\n\ndef pontos_bolao(aposta1, aposta2, real1, real2):\n    pontos = 0\n    if resultado(aposta1, aposta2) == resultado(real1, real2):\n        pontos += 10\n    if aposta1 == real1:\n        pontos += 5\n    if aposta2 == real2:\n        pontos += 5\n    return pontos",
+    testes: [["pontos_bolao(0, 1, 3, 2)", "0"], ["pontos_bolao(0, 2, 3, 2)", "5"], ["pontos_bolao(3, 5, 3, 2)", "5"], ["pontos_bolao(1, 0, 3, 2)", "10"], ["pontos_bolao(3, 2, 3, 2)", "20"], ["pontos_bolao(1, 1, 2, 2)", "10"]] },
+  { id: "e93", n: "93", cap: "Seleção", lv: 2, t: "Ano bissexto", fn: "eh_bissexto",
+    enun: "<p><code>eh_bissexto(ano)</code>: divisível por 4, exceto os terminados em 00, que precisam ser divisíveis por 400.</p>",
+    ini: stub("eh_bissexto", "ano", "eh_bissexto(2024)", "True"),
+    dica: "ano % 4 == 0 and (ano % 100 != 0 or ano % 400 == 0)",
+    sol: "def eh_bissexto(ano):\n    return ano % 4 == 0 and (ano % 100 != 0 or ano % 400 == 0)",
+    testes: [["eh_bissexto(2024)", "True"], ["eh_bissexto(2023)", "False"], ["eh_bissexto(1900)", "False"], ["eh_bissexto(2000)", "True"]] },
+  { id: "e96", n: "96", cap: "Seleção", lv: 1, t: "Conceito A, B ou C", fn: "conceito",
+    enun: "<p><code>conceito(n1, n2, n3)</code>: média aritmética ≥ 8 → <code>'A'</code>; ≥ 5 → <code>'B'</code>; menor que 5 → <code>'C'</code>.</p>",
+    ini: stub("conceito", "n1, n2, n3", "conceito(8, 8, 8)", "A"),
+    dica: "Calcule a média primeiro e depois use if/elif/else.",
+    sol: "def conceito(n1, n2, n3):\n    media = (n1 + n2 + n3) / 3\n    if media >= 8:\n        return 'A'\n    elif media >= 5:\n        return 'B'\n    return 'C'",
+    testes: [["conceito(8, 8, 8)", "'A'"], ["conceito(10, 7, 7)", "'A'"], ["conceito(5, 6, 4)", "'B'"], ["conceito(2, 3, 4)", "'C'"]] },
+  { id: "e97", n: "97", cap: "Seleção", lv: 1, t: "Reajuste do Botafogo", fn: "salario_reajustado",
+    enun: "<p>Até R$ 1.000,00 → +20%; de 1.000,01 a 5.000,00 → +10%; acima → sem aumento. <code>salario_reajustado(salario)</code> retorna o novo salário.</p>",
+    ini: stub("salario_reajustado", "salario", "salario_reajustado(1000)", "1200.0"),
+    dica: "if salario <= 1000 ... elif salario <= 5000 ... else ...",
+    sol: "def salario_reajustado(salario):\n    if salario <= 1000:\n        return salario * 1.20\n    elif salario <= 5000:\n        return salario * 1.10\n    return salario",
+    testes: [["salario_reajustado(1000)", "1200.0"], ["salario_reajustado(1000.01)", "1100.011"], ["salario_reajustado(5000)", "5500.0"], ["salario_reajustado(8000)", "8000"]] },
+  { id: "e100", n: "100", cap: "Seleção", lv: 2, t: "Multa de velocidade", fn: "multa",
+    enun: "<p><code>multa(velocidade_maxima, velocidade)</code>: até 10 km/h acima → 50; de 11 a 30 acima → 100; mais de 30 acima → 200; dentro do limite → 0.</p>",
+    ini: stub("multa", "velocidade_maxima, velocidade", "multa(50, 60)", "50"),
+    dica: "Calcule excesso = velocidade - velocidade_maxima e compare o excesso.",
+    sol: "def multa(velocidade_maxima, velocidade):\n    excesso = velocidade - velocidade_maxima\n    if excesso <= 0:\n        return 0\n    elif excesso <= 10:\n        return 50\n    elif excesso <= 30:\n        return 100\n    return 200",
+    testes: [["multa(50, 50)", "0"], ["multa(50, 56)", "50"], ["multa(50, 60)", "50"], ["multa(50, 75)", "100"], ["multa(50, 80)", "100"], ["multa(50, 81)", "200"]] },
+  { id: "e101", n: "101", cap: "Seleção", lv: 1, t: "João Papo-de-Pescador", fn: "multa_pesca",
+    enun: "<p>Acima de 50 kg de peixe, João paga R$ 4,00 por quilo excedente. <code>multa_pesca(peso)</code> retorna a tupla <code>(excesso, multa)</code>; sem excesso, <code>(0, 0)</code>.</p>",
+    ini: stub("multa_pesca", "peso", "multa_pesca(60)", "(10, 40)"),
+    dica: "if peso > 50: excesso = peso - 50 ...",
+    sol: "def multa_pesca(peso):\n    if peso > 50:\n        excesso = peso - 50\n        return excesso, excesso * 4\n    return 0, 0",
+    testes: [["multa_pesca(60)", "(10, 40)"], ["multa_pesca(50)", "(0, 0)"], ["multa_pesca(45.5)", "(0, 0)"], ["multa_pesca(52.5)", "(2.5, 10.0)"]] },
+  { id: "e110", n: "110", cap: "Seleção", lv: 2, t: "Tipo de triângulo", fn: "tipo_triangulo",
+    enun: "<p><code>tipo_triangulo(a, b, c)</code> retorna <code>'Não é triângulo'</code> (cada lado precisa ser menor que a soma dos outros dois), <code>'Equilátero'</code>, <code>'Isósceles'</code> ou <code>'Escaleno'</code>.</p>",
+    ini: stub("tipo_triangulo", "a, b, c", "tipo_triangulo(3, 4, 5)", "Escaleno"),
+    dica: "Primeiro teste se forma triângulo. Depois: três iguais? algum par igual? senão escaleno.",
+    sol: "def tipo_triangulo(a, b, c):\n    if a >= b + c or b >= a + c or c >= a + b:\n        return 'Não é triângulo'\n    if a == b == c:\n        return 'Equilátero'\n    if a == b or b == c or a == c:\n        return 'Isósceles'\n    return 'Escaleno'",
+    testes: [["tipo_triangulo(3, 3, 3)", "'Equilátero'"], ["tipo_triangulo(3, 3, 5)", "'Isósceles'"], ["tipo_triangulo(5, 3, 3)", "'Isósceles'"], ["tipo_triangulo(3, 4, 5)", "'Escaleno'"], ["tipo_triangulo(1, 2, 3)", "'Não é triângulo'"]] },
+  { id: "e114", n: "114", cap: "Seleção", lv: 2, t: "Mensagem do IMC", fn: "mensagem_imc",
+    enun: "<p><code>mensagem_imc(imc)</code>: menor que 20 → <code>'Abaixo de Peso'</code>; de 20 a 25 → <code>'Normal'</code>; acima de 25 → <code>'Excesso de Peso'</code>; acima de 30 → <code>'Obesidade'</code>; acima de 35 → <code>'Obesidade Mórbida'</code>.</p>",
+    ini: stub("mensagem_imc", "imc", "mensagem_imc(22)", "Normal"),
+    dica: "Comece pelo maior: if imc > 35 ... elif imc > 30 ... elif imc > 25 ... elif imc >= 20 ... else.",
+    sol: "def mensagem_imc(imc):\n    if imc > 35:\n        return 'Obesidade Mórbida'\n    elif imc > 30:\n        return 'Obesidade'\n    elif imc > 25:\n        return 'Excesso de Peso'\n    elif imc >= 20:\n        return 'Normal'\n    return 'Abaixo de Peso'",
+    testes: [["mensagem_imc(18)", "'Abaixo de Peso'"], ["mensagem_imc(20)", "'Normal'"], ["mensagem_imc(25)", "'Normal'"], ["mensagem_imc(25.1)", "'Excesso de Peso'"], ["mensagem_imc(31)", "'Obesidade'"], ["mensagem_imc(36)", "'Obesidade Mórbida'"]] },
+  { id: "e115", n: "115", cap: "Seleção", lv: 2, t: "Aposentadoria", fn: "pode_aposentar",
+    enun: "<p><code>pode_aposentar(idade, tempo_trabalho)</code> retorna <code>True</code> se: tiver 65 anos ou mais, <b>ou</b> 30 anos de trabalho ou mais, <b>ou</b> 60 anos de idade <b>e</b> 25 de trabalho.</p>",
+    ini: stub("pode_aposentar", "idade, tempo_trabalho", "pode_aposentar(60, 25)", "True"),
+    dica: "Junte as três condições com or; a terceira usa and entre parênteses.",
+    sol: "def pode_aposentar(idade, tempo_trabalho):\n    return idade >= 65 or tempo_trabalho >= 30 or (idade >= 60 and tempo_trabalho >= 25)",
+    testes: [["pode_aposentar(65, 10)", "True"], ["pode_aposentar(40, 30)", "True"], ["pode_aposentar(60, 25)", "True"], ["pode_aposentar(59, 29)", "False"], ["pode_aposentar(62, 24)", "False"]] },
+
+  // ===== MÚLTIPLA ESCOLHA =====
+  { id: "e117", n: "117", cap: "Múltipla escolha", lv: 1, t: "Valor do lanche", fn: "valor_lanche",
+    enun: "<p>Cardápio: 100 Cachorro quente 1,20 · 101 Bauru simples 1,30 · 102 Bauru com ovo 1,50 · 103 Hambúrguer 1,20 · 104 Cheeseburguer 1,30 · 105 Refrigerante 1,00. <code>valor_lanche(codigo, quantidade)</code> retorna o valor; código inválido retorna 0.</p>",
+    ini: stub("valor_lanche", "codigo, quantidade", "valor_lanche(102, 3)", "4.5"),
+    dica: "Monte um dicionário {codigo: preco} e use precos.get(codigo, 0).",
+    sol: "def valor_lanche(codigo, quantidade):\n    precos = {100: 1.20, 101: 1.30, 102: 1.50, 103: 1.20, 104: 1.30, 105: 1.00}\n    return precos.get(codigo, 0) * quantidade",
+    testes: [["valor_lanche(100, 2)", "2.4"], ["valor_lanche(102, 3)", "4.5"], ["valor_lanche(105, 1)", "1.0"], ["valor_lanche(999, 2)", "0"]] },
+  { id: "e118", n: "118", cap: "Múltipla escolha", lv: 1, t: "Mês por extenso", fn: "nome_mes",
+    enun: "<p><code>nome_mes(n)</code> retorna o nome do mês com inicial maiúscula (<code>'Janeiro'</code> … <code>'Dezembro'</code>) ou <code>'Mês inválido'</code>.</p>",
+    ini: stub("nome_mes", "n", "nome_mes(3)", "Março"),
+    dica: "Uma lista com os 12 nomes: meses[n - 1]. Antes, confira se 1 <= n <= 12.",
+    sol: "def nome_mes(n):\n    meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',\n             'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']\n    if 1 <= n <= 12:\n        return meses[n - 1]\n    return 'Mês inválido'",
+    testes: [["nome_mes(1)", "'Janeiro'"], ["nome_mes(3)", "'Março'"], ["nome_mes(12)", "'Dezembro'"], ["nome_mes(13)", "'Mês inválido'"], ["nome_mes(0)", "'Mês inválido'"]] },
+  { id: "e119", n: "119", cap: "Múltipla escolha", lv: 1, t: "Classificação do produto", fn: "classificar_produto",
+    enun: "<p>1 → <code>'Alimento não-perecível'</code>; 2, 3 ou 4 → <code>'Alimento perecível'</code>; 5 ou 6 → <code>'Vestuário'</code>; 7 → <code>'Higiene Pessoal'</code>; 8 a 15 → <code>'Limpeza e Utensílios Domésticos'</code>; outro → <code>'Código inválido'</code>.</p>",
+    ini: stub("classificar_produto", "codigo", "classificar_produto(3)", "Alimento perecível"),
+    dica: "match codigo: case 2 | 3 | 4: ... ou if codigo in (2, 3, 4).",
+    sol: "def classificar_produto(codigo):\n    match codigo:\n        case 1:\n            return 'Alimento não-perecível'\n        case 2 | 3 | 4:\n            return 'Alimento perecível'\n        case 5 | 6:\n            return 'Vestuário'\n        case 7:\n            return 'Higiene Pessoal'\n        case n if 8 <= n <= 15:\n            return 'Limpeza e Utensílios Domésticos'\n        case _:\n            return 'Código inválido'",
+    testes: [["classificar_produto(1)", "'Alimento não-perecível'"], ["classificar_produto(4)", "'Alimento perecível'"], ["classificar_produto(6)", "'Vestuário'"], ["classificar_produto(7)", "'Higiene Pessoal'"], ["classificar_produto(15)", "'Limpeza e Utensílios Domésticos'"], ["classificar_produto(16)", "'Código inválido'"]] },
+  { id: "e120", n: "120", cap: "Múltipla escolha", lv: 1, t: "Categoria do nadador", fn: "categoria_nadador",
+    enun: "<p>5 a 7 → <code>'Infantil A'</code>; 8 a 11 → <code>'Infantil B'</code>; 12 e 13 → <code>'Juvenil A'</code>; 14 a 17 → <code>'Juvenil B'</code>; 18 ou mais → <code>'Adulto'</code>; menos de 5 → <code>'Sem categoria'</code>.</p>",
+    ini: stub("categoria_nadador", "idade", "categoria_nadador(9)", "Infantil B"),
+    dica: "Cadeia de elif testando o limite de cima: idade < 5, idade <= 7, idade <= 11…",
+    sol: "def categoria_nadador(idade):\n    if idade < 5:\n        return 'Sem categoria'\n    elif idade <= 7:\n        return 'Infantil A'\n    elif idade <= 11:\n        return 'Infantil B'\n    elif idade <= 13:\n        return 'Juvenil A'\n    elif idade <= 17:\n        return 'Juvenil B'\n    return 'Adulto'",
+    testes: [["categoria_nadador(4)", "'Sem categoria'"], ["categoria_nadador(5)", "'Infantil A'"], ["categoria_nadador(11)", "'Infantil B'"], ["categoria_nadador(12)", "'Juvenil A'"], ["categoria_nadador(17)", "'Juvenil B'"], ["categoria_nadador(18)", "'Adulto'"]] },
+
+  // ===== REPETIÇÃO =====
+  { id: "e125", n: "125", cap: "Repetição", lv: 1, t: "Multiplicar só com somas", fn: "multiplicar",
+    enun: "<p><code>multiplicar(a, b)</code> retorna a × b usando apenas somas num laço (b é inteiro ≥ 0). Não use <code>*</code>.</p>",
+    ini: stub("multiplicar", "a, b", "multiplicar(3, 4)", "12"),
+    dica: "Some a, b vezes: resultado = 0; for _ in range(b): resultado += a",
+    sol: "def multiplicar(a, b):\n    resultado = 0\n    for _ in range(b):\n        resultado += a\n    return resultado",
+    testes: [["multiplicar(3, 4)", "12"], ["multiplicar(7, 0)", "0"], ["multiplicar(-2, 5)", "-10"], ["multiplicar(0, 9)", "0"]] },
+  { id: "e126", n: "126", cap: "Repetição", lv: 1, t: "Tabuada (programa)",
+    enun: "<p>Programa que lê um número e mostra a tabuada de 1 a 10 no formato <code>5 x 1 = 5</code>, uma linha por conta.</p>",
+    ini: "n = int(input(\"Tabuada do: \"))\n# use um for de 1 a 10\n", stdin: "5",
+    dica: "for i in range(1, 11): print(f\"{n} x {i} = {n * i}\")",
+    sol: "n = int(input(\"Tabuada do: \"))\nfor i in range(1, 11):\n    print(f\"{n} x {i} = {n * i}\")",
+    io: [["5", ["5x1=5", "5x5=25", "5x10=50"]], ["7", ["7x3=21", "7x9=63", "7x10=70"]]] },
+  { id: "e129", n: "129", cap: "Repetição", lv: 1, t: "Soma de 1 até N", fn: "soma_ate_n",
+    enun: "<p><code>soma_ate_n(n)</code> retorna 1 + 2 + … + n usando um laço.</p>",
+    ini: stub("soma_ate_n", "n", "soma_ate_n(5)", "15"),
+    dica: "Acumulador: total = 0; for i in range(1, n + 1): total += i",
+    sol: "def soma_ate_n(n):\n    total = 0\n    for i in range(1, n + 1):\n        total += i\n    return total",
+    testes: [["soma_ate_n(5)", "15"], ["soma_ate_n(1)", "1"], ["soma_ate_n(100)", "5050"], ["soma_ate_n(0)", "0"]] },
+  { id: "e130", n: "130", cap: "Repetição", lv: 2, t: "Média até digitar zero (programa)",
+    enun: "<p>Programa que lê números inteiros positivos até ser digitado 0 e mostra a média dos números lidos (sem contar o zero).</p><p>Entrada 4, 5, 0 → a saída deve conter <code>4.5</code>.</p>",
+    ini: "soma = 0\nquantidade = 0\n# leia o primeiro número, depois use while numero != 0\n", stdin: "4\n5\n0",
+    dica: "Leia antes do while e de novo no fim de cada volta. Média = soma / quantidade.",
+    sol: "soma = 0\nquantidade = 0\nnumero = int(input(\"Número: \"))\nwhile numero != 0:\n    soma += numero\n    quantidade += 1\n    numero = int(input(\"Número: \"))\nprint(\"Média:\", soma / quantidade)",
+    io: [["4\n5\n0", ["4.5"]], ["10\n20\n30\n0", ["20"]], ["7\n0", ["7"]]] },
+  { id: "e133", n: "133", cap: "Repetição", lv: 1, t: "Múltiplos de N entre X e Y", fn: "multiplos",
+    enun: "<p><code>multiplos(n, x, y)</code> retorna uma lista com os múltiplos de n de x até y (incluindo os dois).</p>",
+    ini: stub("multiplos", "n, x, y", "multiplos(3, 1, 10)", "[3, 6, 9]"),
+    dica: "Percorra range(x, y + 1) e guarde quem tem i % n == 0.",
+    sol: "def multiplos(n, x, y):\n    resultado = []\n    for i in range(x, y + 1):\n        if i % n == 0:\n            resultado.append(i)\n    return resultado",
+    testes: [["multiplos(3, 1, 10)", "[3, 6, 9]"], ["multiplos(5, 10, 30)", "[10, 15, 20, 25, 30]"], ["multiplos(7, 1, 6)", "[]"]] },
+  { id: "e134", n: "134", cap: "Repetição", lv: 2, t: "É primo?", fn: "eh_primo",
+    enun: "<p><code>eh_primo(n)</code> retorna <code>True</code> se n só é divisível por 1 e por ele mesmo. 0 e 1 não são primos.</p>",
+    ini: stub("eh_primo", "n", "eh_primo(17)", "True"),
+    dica: "Se n < 2, não é. Depois teste divisores de 2 até n - 1 (ou só até a raiz de n): achou um, não é primo.",
+    sol: "def eh_primo(n):\n    if n < 2:\n        return False\n    d = 2\n    while d * d <= n:\n        if n % d == 0:\n            return False\n        d += 1\n    return True",
+    testes: [["eh_primo(0)", "False"], ["eh_primo(1)", "False"], ["eh_primo(2)", "True"], ["eh_primo(9)", "False"], ["eh_primo(17)", "True"], ["eh_primo(97)", "True"], ["eh_primo(100)", "False"]] },
+  { id: "e135", n: "135", cap: "Repetição", lv: 2, t: "Maior até digitar zero (programa)",
+    enun: "<p>Programa que lê inteiros positivos até ser digitado 0 e mostra o maior deles.</p>",
+    ini: "maior = 0\n# leia números até digitar 0\n", stdin: "5\n17\n3\n0",
+    dica: "Como os números são positivos, dá para começar com maior = 0. A cada número, if numero > maior: maior = numero.",
+    sol: "maior = 0\nnumero = int(input(\"Número: \"))\nwhile numero != 0:\n    if numero > maior:\n        maior = numero\n    numero = int(input(\"Número: \"))\nprint(\"Maior:\", maior)",
+    io: [["5\n17\n3\n0", ["17"]], ["42\n0", ["42"]], ["1\n2\n3\n99\n4\n0", ["99"]]] },
+  { id: "e153", n: "153", cap: "Repetição", lv: 2, t: "Série H = 1 + 1/2 + … + 1/N", fn: "serie_h",
+    enun: "<p><code>serie_h(n)</code> retorna 1 + 1/2 + 1/3 + … + 1/n.</p>",
+    ini: stub("serie_h", "n", "serie_h(2)", "1.5"),
+    dica: "Acumulador começando em 0, somando 1 / i para i de 1 a n.",
+    sol: "def serie_h(n):\n    h = 0\n    for i in range(1, n + 1):\n        h += 1 / i\n    return h",
+    testes: [["serie_h(1)", "1.0"], ["serie_h(2)", "1.5"], ["serie_h(4)", "2.083333333333333"]] },
+  { id: "e154", n: "154", cap: "Repetição", lv: 2, t: "Fibonacci", fn: "fibonacci",
+    enun: "<p><code>fibonacci(n)</code> retorna uma lista com os n primeiros termos: 0, 1, 1, 2, 3, 5, 8… (n ≥ 2).</p>",
+    ini: stub("fibonacci", "n", "fibonacci(8)", "[0, 1, 1, 2, 3, 5, 8, 13]"),
+    dica: "Comece com [0, 1]. Enquanto a lista tiver menos de n itens, adicione a soma dos dois últimos.",
+    sol: "def fibonacci(n):\n    termos = [0, 1]\n    while len(termos) < n:\n        termos.append(termos[-1] + termos[-2])\n    return termos[:n]",
+    testes: [["fibonacci(2)", "[0, 1]"], ["fibonacci(8)", "[0, 1, 1, 2, 3, 5, 8, 13]"], ["fibonacci(10)[-1]", "34"]] },
+  { id: "e155", n: "155", cap: "Repetição", lv: 1, t: "Fatorial", fn: "fatorial",
+    enun: "<p><code>fatorial(n)</code> retorna n! = 1 × 2 × … × n, com 0! = 1. Use um laço.</p>",
+    ini: stub("fatorial", "n", "fatorial(5)", "120"),
+    dica: "Acumulador de multiplicação começa em 1, não em 0.",
+    sol: "def fatorial(n):\n    resultado = 1\n    for i in range(2, n + 1):\n        resultado *= i\n    return resultado",
+    testes: [["fatorial(0)", "1"], ["fatorial(1)", "1"], ["fatorial(5)", "120"], ["fatorial(10)", "3628800"]] },
+  { id: "e158", n: "158", cap: "Repetição", lv: 1, t: "Série S = 2¹ + 2² + … + 2ⁿ", fn: "serie_s",
+    enun: "<p><code>serie_s(n)</code> retorna 2**1 + 2**2 + … + 2**n.</p>",
+    ini: stub("serie_s", "n", "serie_s(3)", "14"),
+    dica: "for i in range(1, n + 1): s += 2 ** i",
+    sol: "def serie_s(n):\n    s = 0\n    for i in range(1, n + 1):\n        s += 2 ** i\n    return s",
+    testes: [["serie_s(1)", "2"], ["serie_s(3)", "14"], ["serie_s(10)", "2046"]] },
+  { id: "e174", n: "174", cap: "Repetição", lv: 2, t: "Contar cada vogal", fn: "contar_vogais",
+    enun: "<p><code>contar_vogais(texto)</code> retorna um dicionário com a quantidade de cada vogal, sem diferenciar maiúsculas: <code>{'a': …, 'e': …, 'i': …, 'o': …, 'u': …}</code>.</p>",
+    ini: stub("contar_vogais", "texto", "contar_vogais('banana')", "{'a': 3, 'e': 0, 'i': 0, 'o': 0, 'u': 0}"),
+    dica: "Comece com todas as vogais em 0. Percorra texto.lower() e some 1 quando a letra for uma chave do dicionário.",
+    sol: "def contar_vogais(texto):\n    contagem = {'a': 0, 'e': 0, 'i': 0, 'o': 0, 'u': 0}\n    for letra in texto.lower():\n        if letra in contagem:\n            contagem[letra] += 1\n    return contagem",
+    testes: [["contar_vogais('banana')", "{'a': 3, 'e': 0, 'i': 0, 'o': 0, 'u': 0}"], ["contar_vogais('AEIOUa')", "{'a': 2, 'e': 1, 'i': 1, 'o': 1, 'u': 1}"], ["contar_vogais('xyz')", "{'a': 0, 'e': 0, 'i': 0, 'o': 0, 'u': 0}"]] },
+  { id: "e174b", n: "174 (rainha)", cap: "Repetição", lv: 1, t: "Grãos de trigo no tabuleiro", fn: "graos",
+    enun: "<p>A primeira casa tem 1 grão e cada casa seguinte o dobro da anterior. <code>graos(casas)</code> retorna o total de grãos nas primeiras <code>casas</code> casas. O monge esperava <code>graos(64)</code>.</p>",
+    ini: stub("graos", "casas", "graos(3)", "7"),
+    dica: "Duas variáveis: na_casa (começa em 1, dobra a cada volta) e total.",
+    sol: "def graos(casas):\n    total = 0\n    na_casa = 1\n    for _ in range(casas):\n        total += na_casa\n        na_casa *= 2\n    return total",
+    testes: [["graos(1)", "1"], ["graos(3)", "7"], ["graos(64)", "18446744073709551615"]] },
+  { id: "e180", n: "180", cap: "Repetição", lv: 3, t: "Pingue-pongue", fn: "vencedor_partida",
+    enun: "<p><code>vencedor_partida(pontos)</code> recebe a lista de quem ganhou cada ponto (1 ou 2). A partida acaba quando alguém tem 21 pontos ou mais <b>e</b> 2 de vantagem. Retorne o vencedor (1 ou 2) ou 0 se a partida não terminou.</p>",
+    ini: stub("vencedor_partida", "pontos", "vencedor_partida([1] * 21)", "1"),
+    dica: "Percorra os pontos somando placar1/placar2. Depois de cada ponto, teste max(placar) >= 21 e abs(placar1 - placar2) >= 2.",
+    sol: "def vencedor_partida(pontos):\n    p1 = p2 = 0\n    for quem in pontos:\n        if quem == 1:\n            p1 += 1\n        else:\n            p2 += 1\n        if (p1 >= 21 or p2 >= 21) and abs(p1 - p2) >= 2:\n            return 1 if p1 > p2 else 2\n    return 0",
+    testes: [["vencedor_partida([1] * 21)", "1"], ["vencedor_partida([1] * 21 + [2] * 5)", "1"], ["vencedor_partida([2] * 20 + [1] * 20 + [2, 2])", "2"], ["vencedor_partida([1] * 20 + [2] * 20 + [1, 2, 1, 1])", "1"], ["vencedor_partida([1, 2, 1])", "0"]] },
+  { id: "e182", n: "182", cap: "Repetição", lv: 2, t: "Caixa eletrônico", fn: "notas_saque",
+    enun: "<p>Notas de 50, 10, 5 e 1, sempre com o menor número de notas. <code>notas_saque(valor)</code> retorna a tupla <code>(notas_50, notas_10, notas_5, notas_1)</code>. Ex.: 166 → (3, 1, 1, 1).</p>",
+    ini: stub("notas_saque", "valor", "notas_saque(166)", "(3, 1, 1, 1)"),
+    dica: "Para cada nota, da maior para a menor: quantidade = valor // nota; valor = valor % nota.",
+    sol: "def notas_saque(valor):\n    resultado = []\n    for nota in (50, 10, 5, 1):\n        resultado.append(valor // nota)\n        valor = valor % nota\n    return tuple(resultado)",
+    testes: [["notas_saque(166)", "(3, 1, 1, 1)"], ["notas_saque(50)", "(1, 0, 0, 0)"], ["notas_saque(4)", "(0, 0, 0, 4)"], ["notas_saque(99)", "(1, 4, 1, 4)"]] },
+  { id: "e183", n: "183", cap: "Repetição", lv: 1, t: "Distância do número chave", fn: "distancia",
+    enun: "<p><code>distancia(chave, numero)</code> retorna o quanto o número está longe da chave, sempre positivo.</p>",
+    ini: stub("distancia", "chave, numero", "distancia(20, 15)", "5"),
+    dica: "abs() ou um if que inverte o sinal.",
+    sol: "def distancia(chave, numero):\n    return abs(chave - numero)",
+    testes: [["distancia(20, 15)", "5"], ["distancia(17, 20)", "3"], ["distancia(8, 8)", "0"]] },
+
+  // ===== VETOR E MATRIZ =====
+  { id: "e188", n: "188", cap: "Vetor e matriz", lv: 1, t: "Vetor invertido", fn: "inverter",
+    enun: "<p><code>inverter(v)</code> retorna uma <b>nova</b> lista com os elementos de v na ordem inversa. Treine sem <code>[::-1]</code> nem <code>reverse()</code>.</p>",
+    ini: stub("inverter", "v", "inverter([23, 37, 20, 26])", "[26, 20, 37, 23]"),
+    dica: "Percorra os índices de trás para frente: range(len(v) - 1, -1, -1).",
+    sol: "def inverter(v):\n    b = []\n    for i in range(len(v) - 1, -1, -1):\n        b.append(v[i])\n    return b",
+    testes: [["inverter([23, 37, 20, 26])", "[26, 20, 37, 23]"], ["inverter([])", "[]"], ["inverter([1])", "[1]"]] },
+  { id: "e189", n: "189", cap: "Vetor e matriz", lv: 1, t: "Soma de dois vetores", fn: "somar_vetores",
+    enun: "<p><code>somar_vetores(a, b)</code> retorna C com C[i] = A[i] + B[i].</p>",
+    ini: stub("somar_vetores", "a, b", "somar_vetores([23, 37, 30], [30, 32, 46])", "[53, 69, 76]"),
+    dica: "for i in range(len(a)): c.append(a[i] + b[i])",
+    sol: "def somar_vetores(a, b):\n    c = []\n    for i in range(len(a)):\n        c.append(a[i] + b[i])\n    return c",
+    testes: [["somar_vetores([23, 37, 30], [30, 32, 46])", "[53, 69, 76]"], ["somar_vetores([], [])", "[]"], ["somar_vetores([-1, 0], [1, 5])", "[0, 5]"]] },
+  { id: "e190", n: "190", cap: "Vetor e matriz", lv: 1, t: "Intercalar vetores", fn: "intercalar",
+    enun: "<p><code>intercalar(a, b)</code> retorna [a0, b0, a1, b1, …] (os dois têm o mesmo tamanho).</p>",
+    ini: stub("intercalar", "a, b", "intercalar([23, 37, 30], [30, 32, 46])", "[23, 30, 37, 32, 30, 46]"),
+    dica: "A cada índice i, faça dois append: primeiro a[i], depois b[i].",
+    sol: "def intercalar(a, b):\n    c = []\n    for i in range(len(a)):\n        c.append(a[i])\n        c.append(b[i])\n    return c",
+    testes: [["intercalar([23, 37, 30], [30, 32, 46])", "[23, 30, 37, 32, 30, 46]"], ["intercalar([1], [2])", "[1, 2]"], ["intercalar([], [])", "[]"]] },
+  { id: "e191", n: "191", cap: "Vetor e matriz", lv: 1, t: "Dia do rodízio", fn: "dia_rodizio",
+    enun: "<p>Rodízio de São Paulo pelo último dígito da placa: 1 e 2 → <code>'Segunda-feira'</code>; 3 e 4 → <code>'Terça-feira'</code>; 5 e 6 → <code>'Quarta-feira'</code>; 7 e 8 → <code>'Quinta-feira'</code>; 9 e 0 → <code>'Sexta-feira'</code>. <code>dia_rodizio(numero_placa)</code> recebe os 4 dígitos como inteiro.</p>",
+    ini: stub("dia_rodizio", "numero_placa", "dia_rodizio(1234)", "Terça-feira"),
+    dica: "Último dígito: numero_placa % 10. Uma lista de 10 posições resolve sem if: dias[digito].",
+    sol: "def dia_rodizio(numero_placa):\n    dias = ['Sexta-feira', 'Segunda-feira', 'Segunda-feira', 'Terça-feira', 'Terça-feira',\n            'Quarta-feira', 'Quarta-feira', 'Quinta-feira', 'Quinta-feira', 'Sexta-feira']\n    return dias[numero_placa % 10]",
+    testes: [["dia_rodizio(1234)", "'Terça-feira'"], ["dia_rodizio(5671)", "'Segunda-feira'"], ["dia_rodizio(8890)", "'Sexta-feira'"], ["dia_rodizio(1005)", "'Quarta-feira'"], ["dia_rodizio(4448)", "'Quinta-feira'"]] },
+  { id: "e198", n: "198", cap: "Vetor e matriz", lv: 3, t: "Repetidos para o final", fn: "repetidos_no_final",
+    enun: "<p>Dado um vetor em ordem crescente, coloque os valores sem repetição no começo e as repetições, em ordem crescente, no final. <code>[1, 2, 2, 3, 3, 4]</code> → <code>[1, 2, 3, 4, 2, 3]</code>.</p>",
+    ini: stub("repetidos_no_final", "v", "repetidos_no_final([1, 2, 2, 3, 3, 4])", "[1, 2, 3, 4, 2, 3]"),
+    dica: "Duas listas: unicos e repetidos. Se o valor já está em unicos, vai para repetidos. No fim, junte as duas.",
+    sol: "def repetidos_no_final(v):\n    unicos = []\n    repetidos = []\n    for x in v:\n        if x in unicos:\n            repetidos.append(x)\n        else:\n            unicos.append(x)\n    return unicos + repetidos",
+    testes: [["repetidos_no_final([1, 2, 2, 3, 3, 4])", "[1, 2, 3, 4, 2, 3]"], ["repetidos_no_final([1, 1, 1])", "[1, 1, 1]"], ["repetidos_no_final([5, 5, 6, 7, 7])", "[5, 6, 7, 5, 7]"], ["repetidos_no_final([1, 2, 3])", "[1, 2, 3]"]] },
+  { id: "e200", n: "200", cap: "Vetor e matriz", lv: 1, t: "Tem números repetidos?", fn: "tem_repetidos",
+    enun: "<p><code>tem_repetidos(v)</code> retorna <code>True</code> se algum número aparece mais de uma vez.</p>",
+    ini: stub("tem_repetidos", "v", "tem_repetidos([1, 2, 1])", "True"),
+    dica: "Compare cada par (i, j) com j > i, ou use len(set(v)) != len(v).",
+    sol: "def tem_repetidos(v):\n    for i in range(len(v)):\n        for j in range(i + 1, len(v)):\n            if v[i] == v[j]:\n                return True\n    return False",
+    testes: [["tem_repetidos([1, 2, 3])", "False"], ["tem_repetidos([1.5, 2, 1.5])", "True"], ["tem_repetidos([])", "False"]] },
+  { id: "e206", n: "206", cap: "Vetor e matriz", lv: 3, t: "Dois pares diferentes", fn: "dois_pares",
+    enun: "<p><code>dois_pares(nums)</code> retorna <code>True</code> se existem pelo menos dois valores <b>diferentes</b> que aparecem duas vezes ou mais. {3,4,4,5,3} → True; {1,2,2,1,2} → True; {2,2,2,3,2} → False.</p>",
+    ini: stub("dois_pares", "nums", "dois_pares([3, 4, 4, 5, 3])", "True"),
+    dica: "Para cada valor diferente (set), conte quantas vezes aparece. Conte quantos valores têm contagem >= 2.",
+    sol: "def dois_pares(nums):\n    valores_com_par = 0\n    for valor in set(nums):\n        if nums.count(valor) >= 2:\n            valores_com_par += 1\n    return valores_com_par >= 2",
+    testes: [["dois_pares([3, 4, 4, 5, 3])", "True"], ["dois_pares([1, 2, 2, 1, 2])", "True"], ["dois_pares([2, 2, 2, 3, 2])", "False"], ["dois_pares([1, 2, 3, 4, 5])", "False"]] },
+  { id: "e212", n: "212", cap: "Vetor e matriz", lv: 3, t: "Quem ganhou o jogo da velha?", fn: "vencedor_velha",
+    enun: "<p><code>vencedor_velha(tab)</code> recebe uma matriz 3×3 com <code>'X'</code> e <code>'O'</code> (todas as casas preenchidas) e retorna <code>'X'</code>, <code>'O'</code> ou <code>'Empate'</code>.</p>",
+    ini: stub("vencedor_velha", "tab", "vencedor_velha([['X','X','X'],['O','O','X'],['X','O','O']])", "X"),
+    dica: "Monte uma lista com as 8 linhas possíveis (3 linhas, 3 colunas, 2 diagonais). Se alguma tem os 3 iguais, esse é o vencedor.",
+    sol: "def vencedor_velha(tab):\n    linhas = []\n    for i in range(3):\n        linhas.append([tab[i][0], tab[i][1], tab[i][2]])\n        linhas.append([tab[0][i], tab[1][i], tab[2][i]])\n    linhas.append([tab[0][0], tab[1][1], tab[2][2]])\n    linhas.append([tab[0][2], tab[1][1], tab[2][0]])\n    for l in linhas:\n        if l[0] == l[1] == l[2]:\n            return l[0]\n    return 'Empate'",
+    testes: [["vencedor_velha([['X','X','X'],['O','O','X'],['X','O','O']])", "'X'"], ["vencedor_velha([['O','X','X'],['X','O','O'],['X','X','O']])", "'O'"], ["vencedor_velha([['X','O','X'],['X','O','O'],['O','X','X']])", "'Empate'"], ["vencedor_velha([['O','X','X'],['O','X','O'],['X','O','O']])", "'X'"]] },
+  { id: "e215", n: "215", cap: "Vetor e matriz", lv: 2, t: "Determinante 3×3", fn: "determinante",
+    enun: "<p><code>determinante(m)</code> calcula o determinante de uma matriz 3×3 (regra de Sarrus).</p>",
+    ini: stub("determinante", "m", "determinante([[2, 0, 0], [0, 3, 0], [0, 0, 4]])", "24"),
+    dica: "Sarrus: soma das 3 diagonais para a direita menos a soma das 3 diagonais para a esquerda.",
+    sol: "def determinante(m):\n    a, b, c = m[0]\n    d, e, f = m[1]\n    g, h, i = m[2]\n    return a*e*i + b*f*g + c*d*h - c*e*g - a*f*h - b*d*i",
+    testes: [["determinante([[1, 2, 3], [4, 5, 6], [7, 8, 9]])", "0"], ["determinante([[2, 0, 0], [0, 3, 0], [0, 0, 4]])", "24"], ["determinante([[1, 2, 1], [0, 1, 3], [2, 1, 0]])", "7"]] },
+  { id: "e219", n: "219", cap: "Vetor e matriz", lv: 2, t: "Matriz transposta", fn: "transposta",
+    enun: "<p><code>transposta(m)</code> retorna a transposta: as linhas viram colunas (B[j][i] = A[i][j]).</p>",
+    ini: stub("transposta", "m", "transposta([[1, 2], [3, 4]])", "[[1, 3], [2, 4]]"),
+    dica: "A nova matriz tem len(m[0]) linhas. Para cada coluna j, monte a linha [m[i][j] para cada i].",
+    sol: "def transposta(m):\n    linhas, colunas = len(m), len(m[0])\n    t = []\n    for j in range(colunas):\n        nova = []\n        for i in range(linhas):\n            nova.append(m[i][j])\n        t.append(nova)\n    return t",
+    testes: [["transposta([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]])", "[[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]"], ["transposta([[1]])", "[[1]]"], ["transposta([[1, 2], [3, 4]])", "[[1, 3], [2, 4]]"]] },
+  { id: "e226", n: "226", cap: "Vetor e matriz", lv: 1, t: "Maior elemento e posição", fn: "maior_e_posicao",
+    enun: "<p><code>maior_e_posicao(v)</code> retorna <code>(maior, indice)</code>, com o índice da <b>primeira</b> ocorrência (começando em 0). Sem usar max().</p>",
+    ini: stub("maior_e_posicao", "v", "maior_e_posicao([3, 9, 2, 9])", "(9, 1)"),
+    dica: "Comece com maior = v[0], pos = 0 e percorra a partir do índice 1. Use > (não >=) para ficar com a primeira.",
+    sol: "def maior_e_posicao(v):\n    maior = v[0]\n    pos = 0\n    for i in range(1, len(v)):\n        if v[i] > maior:\n            maior = v[i]\n            pos = i\n    return maior, pos",
+    testes: [["maior_e_posicao([3, 9, 2, 9])", "(9, 1)"], ["maior_e_posicao([5])", "(5, 0)"], ["maior_e_posicao([1, 2, 3])", "(3, 2)"], ["maior_e_posicao([-4, -1, -7])", "(-1, 1)"]] },
+  { id: "e243", n: "243", cap: "Vetor e matriz", lv: 1, t: "Palíndromo", fn: "eh_palindromo",
+    enun: "<p><code>eh_palindromo(texto)</code>: lê igual de trás para frente? Ignore espaços e maiúsculas.</p>",
+    ini: stub("eh_palindromo", "texto", "eh_palindromo('ARARA')", "True"),
+    dica: "limpo = texto.replace(' ', '').lower(); compare com limpo[::-1].",
+    sol: "def eh_palindromo(texto):\n    limpo = texto.replace(' ', '').lower()\n    return limpo == limpo[::-1]",
+    testes: [["eh_palindromo('ARARA')", "True"], ["eh_palindromo('Ana')", "True"], ["eh_palindromo('Pedro')", "False"], ["eh_palindromo('Socorram me subi no onibus em Marrocos')", "True"]] },
+  { id: "e247", n: "247", cap: "Vetor e matriz", lv: 2, t: "Consoante mais usada", fn: "consoante_mais_usada",
+    enun: "<p><code>consoante_mais_usada(frase)</code> retorna a consoante (minúscula) que mais aparece. Em caso de empate, a que vem primeiro no alfabeto. Considere só letras sem acento.</p>",
+    ini: stub("consoante_mais_usada", "frase", "consoante_mais_usada('casa assada')", "s"),
+    dica: "Conte num dicionário só as letras que são isalpha() e não estão em 'aeiou'. Depois percorra as chaves em ordem (sorted) guardando a de maior contagem.",
+    sol: "def consoante_mais_usada(frase):\n    contagem = {}\n    for letra in frase.lower():\n        if letra.isalpha() and letra not in 'aeiou':\n            contagem[letra] = contagem.get(letra, 0) + 1\n    melhor = None\n    for letra in sorted(contagem):\n        if melhor is None or contagem[letra] > contagem[melhor]:\n            melhor = letra\n    return melhor",
+    testes: [["consoante_mais_usada('programar e divertido')", "'r'"], ["consoante_mais_usada('casa assada')", "'s'"], ["consoante_mais_usada('Bob')", "'b'"], ["consoante_mais_usada('tic tac')", "'c'"]] },
+  { id: "e251", n: "251", cap: "Vetor e matriz", lv: 1, t: "Frequência dos valores", fn: "frequencia",
+    enun: "<p><code>frequencia(v)</code> retorna um dicionário <code>{valor: quantas vezes aparece}</code>.</p>",
+    ini: stub("frequencia", "v", "frequencia([3, 1, 3])", "{3: 2, 1: 1}"),
+    dica: "contagem[x] = contagem.get(x, 0) + 1",
+    sol: "def frequencia(v):\n    contagem = {}\n    for x in v:\n        contagem[x] = contagem.get(x, 0) + 1\n    return contagem",
+    testes: [["frequencia([3, 1, 3, 2, 3, 1])", "{3: 3, 1: 2, 2: 1}"], ["frequencia([])", "{}"], ["frequencia([7])", "{7: 1}"]] },
+  { id: "e266", n: "266", cap: "Vetor e matriz", lv: 2, t: "Matriz simétrica", fn: "eh_simetrica",
+    enun: "<p><code>eh_simetrica(m)</code>: uma matriz quadrada é simétrica se m[i][j] == m[j][i] para todo i, j.</p>",
+    ini: stub("eh_simetrica", "m", "eh_simetrica([[1, 2], [2, 1]])", "True"),
+    dica: "Dois for. Achou um par diferente, retorne False na hora. Se passar por tudo, True.",
+    sol: "def eh_simetrica(m):\n    n = len(m)\n    for i in range(n):\n        for j in range(n):\n            if m[i][j] != m[j][i]:\n                return False\n    return True",
+    testes: [["eh_simetrica([[1, 2], [2, 1]])", "True"], ["eh_simetrica([[1, 2], [3, 1]])", "False"], ["eh_simetrica([[5]])", "True"], ["eh_simetrica([[1, 7, 3], [7, 4, 5], [3, 5, 6]])", "True"]] },
+  { id: "e272", n: "272", cap: "Vetor e matriz", lv: 1, t: "Soma de cada linha", fn: "soma_linhas",
+    enun: "<p><code>soma_linhas(m)</code> retorna <code>(lista_com_a_soma_de_cada_linha, total)</code>. Para [[1,2,3],[4,5,6]] → ([6, 15], 21).</p>",
+    ini: stub("soma_linhas", "m", "soma_linhas([[1, 2, 3], [4, 5, 6]])", "([6, 15], 21)"),
+    dica: "Para cada linha, some seus elementos e guarde. O total é a soma dessas somas.",
+    sol: "def soma_linhas(m):\n    somas = []\n    for linha in m:\n        s = 0\n        for x in linha:\n            s += x\n        somas.append(s)\n    return somas, sum(somas)",
+    testes: [["soma_linhas([[1, 2, 3], [4, 5, 6]])", "([6, 15], 21)"], ["soma_linhas([[0]])", "([0], 0)"], ["soma_linhas([[1, -1], [2, 2], [5, 0]])", "([0, 4, 5], 9)"]] },
+  { id: "ecpf", n: "168 (CPF)", cap: "Vetor e matriz", lv: 3, t: "CPF válido?", fn: "cpf_valido",
+    enun: "<p><code>cpf_valido(cpf)</code> recebe o CPF como texto, com ou sem pontos e traço, e verifica os dois dígitos verificadores pelo algoritmo da lista (pesos 10…2, depois 11…2; resto &lt; 2 → 0, senão 11 − resto). Precisa ter 11 dígitos.</p>",
+    ini: stub("cpf_valido", "cpf", "cpf_valido('111.444.777-35')", "True"),
+    dica: "Extraia só os dígitos: [int(c) for c in cpf if c.isdigit()]. Faça uma função auxiliar digito(numeros, peso_inicial) que soma numeros[i] * (peso_inicial - i) e aplica a regra do resto.",
+    sol: "def digito(numeros, peso_inicial):\n    soma = 0\n    for i in range(len(numeros)):\n        soma += numeros[i] * (peso_inicial - i)\n    resto = soma % 11\n    return 0 if resto < 2 else 11 - resto\n\ndef cpf_valido(cpf):\n    d = [int(c) for c in cpf if c.isdigit()]\n    if len(d) != 11:\n        return False\n    d1 = digito(d[:9], 10)\n    d2 = digito(d[:9] + [d1], 11)\n    return d[9] == d1 and d[10] == d2",
+    testes: [["cpf_valido('111.444.777-35')", "True"], ["cpf_valido('11144477735')", "True"], ["cpf_valido('111.444.777-36')", "False"], ["cpf_valido('123.456.789-09')", "True"], ["cpf_valido('123.456.789-00')", "False"], ["cpf_valido('1234')", "False"]] },
+
+  // ===== REGISTROS =====
+  { id: "e274", n: "274", cap: "Registros", lv: 2, t: "Análise de registros de pessoas", fn: "acima_da_media",
+    enun: "<p>Cada pessoa é um dicionário <code>{'nome': ..., 'idade': ...}</code>. <code>acima_da_media(pessoas)</code> retorna a lista dos <b>nomes</b> das pessoas com idade maior que a média do grupo, na ordem original.</p>",
+    ini: stub("acima_da_media", "pessoas", "acima_da_media([{'nome': 'Ana', 'idade': 10}, {'nome': 'Bia', 'idade': 30}])", "['Bia']"),
+    dica: "Primeiro calcule a média percorrendo a lista. Depois percorra de novo e guarde p['nome'] quando p['idade'] > media.",
+    sol: "def acima_da_media(pessoas):\n    if not pessoas:\n        return []\n    soma = 0\n    for p in pessoas:\n        soma += p['idade']\n    media = soma / len(pessoas)\n    return [p['nome'] for p in pessoas if p['idade'] > media]",
+    testes: [["acima_da_media([{'nome': 'Ana', 'idade': 10}, {'nome': 'Bia', 'idade': 30}])", "['Bia']"], ["acima_da_media([{'nome': 'A', 'idade': 17}, {'nome': 'B', 'idade': 25}, {'nome': 'C', 'idade': 31}, {'nome': 'D', 'idade': 15}])", "['B', 'C']"], ["acima_da_media([])", "[]"]] },
+  { id: "e277", n: "277", cap: "Registros", lv: 2, t: "O que comprar", fn: "quanto_comprar",
+    enun: "<p>Cada produto é <code>{'codigo', 'qtd_min', 'qtd_max', 'qtd_est'}</code>. Compra-se quando <code>qtd_est &lt;= qtd_min</code>, e a quantidade é <code>qtd_max - qtd_est</code>. <code>quanto_comprar(produtos)</code> retorna <code>{codigo: quantidade}</code> só dos que precisam.</p>",
+    ini: stub("quanto_comprar", "produtos", "quanto_comprar([{'codigo': 1, 'qtd_min': 10, 'qtd_max': 50, 'qtd_est': 8}])", "{1: 42}"),
+    dica: "Percorra a lista; para cada p que precisa de compra, faça resultado[p['codigo']] = p['qtd_max'] - p['qtd_est'].",
+    sol: "def quanto_comprar(produtos):\n    resultado = {}\n    for p in produtos:\n        if p['qtd_est'] <= p['qtd_min']:\n            resultado[p['codigo']] = p['qtd_max'] - p['qtd_est']\n    return resultado",
+    testes: [["quanto_comprar([{'codigo': 1, 'qtd_min': 10, 'qtd_max': 50, 'qtd_est': 8}, {'codigo': 2, 'qtd_min': 5, 'qtd_max': 30, 'qtd_est': 20}, {'codigo': 3, 'qtd_min': 4, 'qtd_max': 12, 'qtd_est': 4}])", "{1: 42, 3: 8}"], ["quanto_comprar([])", "{}"]] },
+
+  // ===== FUNÇÕES =====
+  { id: "e281", n: "281", cap: "Procedimentos e funções", lv: 2, t: "Data válida", fn: "data_valida",
+    enun: "<p><code>data_valida(dia, mes, ano)</code> retorna <code>True</code> se a data existe. Atenção aos meses de 30 e 31 dias e a fevereiro em ano bissexto.</p>",
+    ini: stub("data_valida", "dia, mes, ano", "data_valida(29, 2, 2024)", "True"),
+    dica: "Crie eh_bissexto(ano) e uma lista dias_no_mes = [31, 28, 31, 30, ...]. Em ano bissexto, fevereiro tem 29.",
+    sol: "def eh_bissexto(ano):\n    return ano % 4 == 0 and (ano % 100 != 0 or ano % 400 == 0)\n\ndef data_valida(dia, mes, ano):\n    if mes < 1 or mes > 12:\n        return False\n    dias = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]\n    if eh_bissexto(ano):\n        dias[1] = 29\n    return 1 <= dia <= dias[mes - 1]",
+    testes: [["data_valida(29, 2, 2024)", "True"], ["data_valida(29, 2, 2023)", "False"], ["data_valida(31, 4, 2025)", "False"], ["data_valida(31, 12, 2025)", "True"], ["data_valida(0, 5, 2025)", "False"], ["data_valida(15, 13, 2025)", "False"], ["data_valida(29, 2, 1900)", "False"]] },
+
+  // ===== EXTRAS =====
+  { id: "x1", n: "extra", cap: "Extras", lv: 2, t: "Classe ContaBancaria", fn: "ContaBancaria",
+    enun: "<p>Crie a classe <code>ContaBancaria(titular, saldo)</code> com o atributo <code>saldo</code> e os métodos <code>depositar(valor)</code> e <code>sacar(valor)</code>. <code>sacar</code> retorna <code>False</code> sem alterar nada se o saldo não der, e <code>True</code> se sacar.</p>",
+    ini: "class ContaBancaria:\n    def __init__(self, titular, saldo):\n        pass\n\n    def depositar(self, valor):\n        pass\n\n    def sacar(self, valor):\n        pass\n\n\nc = ContaBancaria('Ana', 100)\nc.depositar(50)\nprint(c.saldo)  # deve mostrar 150\n",
+    dica: "No __init__ guarde self.titular e self.saldo. Os métodos alteram self.saldo.",
+    sol: "class ContaBancaria:\n    def __init__(self, titular, saldo):\n        self.titular = titular\n        self.saldo = saldo\n\n    def depositar(self, valor):\n        self.saldo += valor\n\n    def sacar(self, valor):\n        if valor > self.saldo:\n            return False\n        self.saldo -= valor\n        return True",
+    testes: [["c = ContaBancaria('Ana', 100)\nc.depositar(50)\nc.saldo", "150"], ["c = ContaBancaria('Ana', 100)\nc.sacar(30)", "True"], ["c = ContaBancaria('Ana', 100)\nc.sacar(30)\nc.saldo", "70"], ["c = ContaBancaria('Ana', 100)\nc.sacar(500)", "False"], ["c = ContaBancaria('Ana', 100)\nc.sacar(500)\nc.saldo", "100"]] },
+  { id: "x2", n: "extra", cap: "Extras", lv: 3, t: "Número romano", fn: "para_romano",
+    enun: "<p><code>para_romano(n)</code> converte um inteiro de 1 a 3999 para algarismos romanos.</p>",
+    ini: stub("para_romano", "n", "para_romano(14)", "XIV"),
+    dica: "Use pares (valor, símbolo) do maior para o menor, incluindo 900 'CM', 400 'CD', 90 'XC', 40 'XL', 9 'IX', 4 'IV'. Enquanto n >= valor, junte o símbolo e subtraia.",
+    sol: "def para_romano(n):\n    tabela = [(1000, 'M'), (900, 'CM'), (500, 'D'), (400, 'CD'), (100, 'C'), (90, 'XC'),\n              (50, 'L'), (40, 'XL'), (10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')]\n    resultado = ''\n    for valor, simbolo in tabela:\n        while n >= valor:\n            resultado += simbolo\n            n -= valor\n    return resultado",
+    testes: [["para_romano(4)", "'IV'"], ["para_romano(9)", "'IX'"], ["para_romano(14)", "'XIV'"], ["para_romano(1994)", "'MCMXCIV'"], ["para_romano(3999)", "'MMMCMXCIX'"]] },
+  { id: "x3", n: "extra", cap: "Extras", lv: 3, t: "Achatar lista (recursão)", fn: "achatar",
+    enun: "<p><code>achatar(lista)</code> recebe listas dentro de listas e retorna uma lista só com os valores, na ordem. <code>[1, [2, [3, 4]], 5]</code> → <code>[1, 2, 3, 4, 5]</code>.</p>",
+    ini: stub("achatar", "lista", "achatar([1, [2, [3, 4]], 5])", "[1, 2, 3, 4, 5]"),
+    dica: "Para cada item: se isinstance(item, list), chame achatar(item) e use extend; senão, append.",
+    sol: "def achatar(lista):\n    resultado = []\n    for item in lista:\n        if isinstance(item, list):\n            resultado.extend(achatar(item))\n        else:\n            resultado.append(item)\n    return resultado",
+    testes: [["achatar([1, [2, [3, 4]], 5])", "[1, 2, 3, 4, 5]"], ["achatar([])", "[]"], ["achatar([[[]]])", "[]"], ["achatar([[1, 2], [3], 4])", "[1, 2, 3, 4]"]] },
+];
+
+
+// ================= APP =================
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("cadpy:" + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("cadpy:" + k, JSON.stringify(v)); } catch (e) { /* armazenamento indisponível */ } },
+};
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ---------- páginas ----------
+const PAGES = [
+  { id: "inicio", t: "Início", g: "Começo" },
+  { id: "logica", t: "Algoritmos e lógica", g: "Lições", n: 1, d: "Entrada, processamento, saída e o tradutor Portugol → Python" },
+  { id: "tipos", t: "Tipos e variáveis", g: "Lições", n: 2, d: "int, float, str, bool, nomes válidos e conversões" },
+  { id: "operadores", t: "Operadores", g: "Lições", n: 3, d: "Contas, MOD e DIV, precedência, E/OU/NÃO" },
+  { id: "mesa", t: "Teste de mesa", g: "Lições", n: 4, d: "Rodar o algoritmo à mão, linha por linha" },
+  { id: "sequencia", t: "Sequência", g: "Lições", n: 5, d: "input, print, f-strings e fórmulas" },
+  { id: "selecao", t: "Seleção (if)", g: "Lições", n: 6, d: "if, elif, else, faixas e condições compostas" },
+  { id: "escolha", t: "Múltipla escolha", g: "Lições", n: 7, d: "match/case, menus e tabelas de preço" },
+  { id: "repeticao", t: "Repetição", g: "Lições", n: 8, d: "for, while, contador, acumulador e flag" },
+  { id: "textos", t: "Textos (strings)", g: "Lições", n: 9, d: "Fatias, métodos e contagem de letras" },
+  { id: "vetores", t: "Vetor e matriz", g: "Lições", n: 10, d: "Listas, ordenação e matrizes" },
+  { id: "registros", t: "Registros", g: "Lições", n: 11, d: "Dicionários, tuplas e conjuntos" },
+  { id: "funcoes", t: "Procedimentos e funções", g: "Lições", n: 12, d: "def, return, parâmetros e recursão" },
+  { id: "erros", t: "Erros e validação", g: "Lições", n: 13, d: "Ler mensagens de erro e try/except" },
+  { id: "modulos", t: "Módulos úteis", g: "Lições", n: 14, d: "math, random e datetime" },
+  { id: "arquivos", t: "Arquivos", g: "Lições", n: 15, d: "Ler e gravar .txt e .csv" },
+  { id: "classes", t: "Classes (extra)", g: "Lições", n: 16, d: "Objetos, métodos e herança" },
+  { id: "builtins", t: "Funções embutidas", g: "Referência" },
+  { id: "metodos", t: "Métodos", g: "Referência" },
+  { id: "receitas", t: "Como montar cada programa", g: "Referência" },
+  { id: "exercicios", t: "Exercícios com correção", g: "Praticar" },
+  { id: "playground", t: "Playground", g: "Praticar" },
+];
+
+// ---------- realce de sintaxe ----------
+const KW = new Set("and as assert async await break case class continue def del elif else except finally for from global if import in is lambda match nonlocal not or pass raise return try while with yield True False None".split(" "));
+const BI = new Set(BUILTINS.map((b) => b[0]).concat(["self"]));
+const TOK = /(#[^\n]*)|([rRbBfFuU]{0,2}(?:"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'))|(\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b)|([A-Za-z_À-ſ][\wÀ-ſ]*)/g;
+function hl(src) {
+  let out = "", last = 0, m;
+  TOK.lastIndex = 0;
+  while ((m = TOK.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    const t = m[0];
+    if (m[1]) out += `<span class="tk-com">${esc(t)}</span>`;
+    else if (m[2]) out += `<span class="tk-str">${esc(t)}</span>`;
+    else if (m[3]) out += `<span class="tk-num">${t}</span>`;
+    else if (KW.has(t)) out += `<span class="tk-kw">${t}</span>`;
+    else if (BI.has(t)) out += `<span class="tk-bi">${t}</span>`;
+    else if (src[TOK.lastIndex] === "(") out += `<span class="tk-fn">${t}</span>`;
+    else out += esc(t);
+    last = TOK.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+// ---------- Python no navegador ----------
+const statusEl = $("#pyStatus");
+let pyFailed = false;
+function waitPy(timeout = 45000) {
+  return new Promise((resolve, reject) => {
+    const t0 = Date.now();
+    (function poll() {
+      if (typeof window.pyRun === "function") return resolve();
+      if (Date.now() - t0 > timeout) return reject(new Error("timeout"));
+      setTimeout(poll, 120);
+    })();
+  });
+}
+waitPy().then(() => {
+  statusEl.textContent = "Python pronto";
+  statusEl.className = "pystatus ok";
+}).catch(() => {
+  pyFailed = true;
+  statusEl.textContent = "Python indisponível";
+  statusEl.className = "pystatus bad";
+});
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    if (typeof window.pyRun !== "function" && typeof window.brython === "function" && !window.__pyBoot) {
+      window.__pyBoot = true;
+      try { window.brython({ debug: 0, ids: ["pyharness"] }); } catch (e) { /* já iniciado */ }
+    }
+  }, 2500);
+});
+
+async function runPy(code, stdin = "", tests = "") {
+  if (pyFailed) throw new Error("indisponivel");
+  await waitPy();
+  await new Promise((r) => setTimeout(r, 15));
+  return JSON.parse(window.pyRun(code, stdin, tests));
+}
+
+const EXPLICA = {
+  SyntaxError: "Erro de escrita: o Python não entendeu a linha. Confira os dois-pontos (:) no fim de if/for/while/def, parênteses e aspas fechados e se usou == para comparar.",
+  IndentationError: "Recuo errado: o que fica dentro de if/for/while/def precisa estar 4 espaços para a direita, todas as linhas do bloco alinhadas.",
+  NameError: "Nome não definido: você usou uma variável ou função que ainda não existe. Confira a digitação (maiúsculas contam) e se ela foi criada antes desta linha.",
+  TypeError: "Tipos que não combinam, como somar texto com número. Converta com int(), float() ou str(). Também acontece ao chamar uma função com a quantidade errada de argumentos.",
+  ValueError: "Valor inválido para a operação, como int('abc') ou int('7.5'). Confira o que foi digitado na Entrada.",
+  IndexError: "Posição fora da lista ou do texto. Lembre: os índices vão de 0 até len - 1.",
+  KeyError: "Essa chave não existe no dicionário. Use 'in' para conferir ou .get(chave, padrao).",
+  ZeroDivisionError: "Divisão por zero. Teste o divisor com um if antes de dividir.",
+  AttributeError: "Esse tipo de valor não tem esse método ou atributo. Confira o nome e o tipo da variável.",
+  EOFError: "O programa chamou input() mais vezes do que as linhas que você colocou na caixa Entrada.",
+  RecursionError: "A função chamou a si mesma sem parar. Falta um caso base que encerre a recursão.",
+  UnboundLocalError: "Você usou a variável dentro da função antes de dar um valor a ela.",
+  ModuleNotFoundError: "Esse módulo não existe aqui. No navegador estão disponíveis os módulos padrão do Python, como math, random e datetime.",
+  ImportError: "Não foi possível importar. Confira o nome do módulo e da função.",
+  OverflowError: "O número ficou grande demais para um float.",
+};
+
+function outputHTML(res) {
+  let h = res.tela ? esc(res.tela) : "";
+  if (!res.ok) {
+    if (h && !h.endsWith("\n")) h += "\n";
+    h += `<span class="errline">${esc(res.tipo)}${res.linha ? " na linha " + res.linha : ""}: ${esc(res.erro)}</span>`;
+    const ex = EXPLICA[res.tipo];
+    if (ex) h += `<span class="hint">${esc(ex)}</span>`;
+  }
+  if (!h) h = '<span class="muted">(nada foi mostrado. Use print() para ver resultados)</span>';
+  return h;
+}
+const FAIL_HTML = '<span class="errline">Não foi possível carregar o Python no navegador.</span><span class="hint">Confira a conexão com a internet e recarregue a página. Você ainda pode copiar o código e rodar no seu computador.</span>';
+
+// ---------- blocos de código ----------
+function enhanceCode(pre) {
+  const code = pre.textContent.replace(/\n+$/, "");
+  const stdin = (pre.dataset.stdin || "").split("|").join("\n");
+  const runnable = pre.dataset.run !== "no";
+  const isPortugol = /^in[ií]cio/i.test(code.trim());
+  pre.innerHTML = isPortugol ? esc(code) : hl(code);
+  const box = document.createElement("div");
+  box.className = "codebox";
+  const bar = document.createElement("div");
+  bar.className = "bar";
+  bar.innerHTML = `<span class="lbl">${isPortugol ? "portugol" : runnable ? "python" : "python · rode no computador"}</span>`;
+  const copy = document.createElement("button");
+  copy.type = "button"; copy.textContent = "Copiar";
+  copy.addEventListener("click", () => copyText(code, copy));
+  bar.appendChild(copy);
+  if (!isPortugol) {
+    const edit = document.createElement("button");
+    edit.type = "button"; edit.textContent = "Editar";
+    edit.title = "Abrir no Playground";
+    edit.addEventListener("click", () => openPlayground(code, stdin));
+    bar.appendChild(edit);
+  }
+  pre.parentNode.insertBefore(box, pre);
+  box.appendChild(bar);
+  box.appendChild(pre);
+  if (runnable && !isPortugol) {
+    const run = document.createElement("button");
+    run.type = "button"; run.className = "run"; run.textContent = "▶ Rodar";
+    const out = document.createElement("div");
+    out.className = "out"; out.hidden = true; out.setAttribute("aria-live", "polite");
+    box.appendChild(out);
+    run.addEventListener("click", async () => {
+      out.hidden = false;
+      out.innerHTML = '<span class="muted">rodando…</span>';
+      try { out.innerHTML = outputHTML(await runPy(code, stdin)); }
+      catch (e) { out.innerHTML = FAIL_HTML; }
+    });
+    bar.appendChild(run);
+  }
+}
+function copyText(text, btn) {
+  const done = () => { const t = btn.textContent; btn.textContent = "Copiado"; setTimeout(() => (btn.textContent = t), 1200); };
+  try {
+    navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+  } catch (e) { fallbackCopy(text, done); }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) { /* sem cópia */ }
+  ta.remove();
+}
+
+// ---------- editor ----------
+function setupEditor(ta, onRun) {
+  ta.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); onRun && onRun(); return; }
+    const { selectionStart: s, selectionEnd: en, value: v } = ta;
+    if (e.key === "Tab") {
+      e.preventDefault();
+      if (e.shiftKey) {
+        const ls = v.lastIndexOf("\n", s - 1) + 1;
+        const rm = v.slice(ls, ls + 4).match(/^ {1,4}/);
+        if (rm) { ta.setRangeText("", ls, ls + rm[0].length, "end"); ta.selectionStart = ta.selectionEnd = Math.max(ls, s - rm[0].length); }
+      } else {
+        ta.setRangeText("    ", s, en, "end");
+      }
+      ta.dispatchEvent(new Event("input"));
+    } else if (e.key === "Enter") {
+      const ls = v.lastIndexOf("\n", s - 1) + 1;
+      const line = v.slice(ls, s);
+      let indent = line.match(/^\s*/)[0];
+      if (/:\s*(#.*)?$/.test(line)) indent += "    ";
+      e.preventDefault();
+      ta.setRangeText("\n" + indent, s, en, "end");
+      ta.dispatchEvent(new Event("input"));
+    }
+  });
+}
+
+// ---------- navegação ----------
+function buildNav() {
+  const nav = $("#sidebar");
+  let html = "", group = null;
+  PAGES.forEach((p) => {
+    if (p.g !== group) {
+      if (group !== null) html += "</div>";
+      group = p.g;
+      html += `<div class="navgroup"><h4>${esc(group)}</h4>`;
+    }
+    html += `<a class="nav" href="#${p.id}" data-page="${p.id}"><span class="n">${p.n ? String(p.n).padStart(2, "0") : "·"}</span><span>${esc(p.t)}</span></a>`;
+  });
+  nav.innerHTML = html + "</div>";
+  $("#trail").innerHTML = PAGES.filter((p) => p.n).map((p) =>
+    `<a href="#${p.id}"><span class="n">${p.n}</span><b>${esc(p.t)}</b><small>${esc(p.d)}</small></a>`).join("");
+}
+
+function route() {
+  let hash = decodeURIComponent(location.hash.slice(1)) || "inicio";
+  let exId = null;
+  if (hash.startsWith("ex-")) { exId = hash.slice(3); hash = "exercicios"; }
+  if (!$("#p-" + hash)) hash = "inicio";
+  $$(".page").forEach((s) => (s.hidden = s.id !== "p-" + hash));
+  $$(".sidebar a.nav").forEach((a) => a.classList.toggle("active", a.dataset.page === hash));
+  document.body.classList.remove("nav-open");
+  $("#menuBtn").setAttribute("aria-expanded", "false");
+  if (hash === "exercicios") showExercise(exId);
+  if (hash === "playground") $("#pgCode").value = store.get("pg:code", $("#pgCode").value);
+  if (hash === "inicio") updateProgress();
+  const i = PAGES.findIndex((p) => p.id === hash);
+  const prev = PAGES[i - 1], next = PAGES[i + 1];
+  $("#pager").innerHTML = (prev ? `<a href="#${prev.id}">← ${esc(prev.t)}</a>` : "<span></span>") + (next ? `<a href="#${next.id}">${esc(next.t)} →</a>` : "");
+  window.scrollTo(0, 0);
+}
+
+// ---------- referência ----------
+function setupFilterTable({ data, chipsEl, searchEl, countEl, tableEl, catOf, catLabel, rowHTML, textOf, head }) {
+  const cats = ["Todos", ...Array.from(new Set(data.map(catOf)))];
+  let cat = "Todos";
+  chipsEl.innerHTML = cats.map((c) => `<button type="button" class="chip" aria-pressed="${c === cat}" data-c="${esc(c)}">${esc(catLabel ? catLabel(c) : c)}</button>`).join("");
+  const render = () => {
+    const q = searchEl.value.trim().toLowerCase();
+    const rows = data.filter((d) => (cat === "Todos" || catOf(d) === cat) && (!q || textOf(d).toLowerCase().includes(q)));
+    tableEl.innerHTML = head + rows.map(rowHTML).join("");
+    countEl.textContent = `${rows.length} de ${data.length}`;
+  };
+  chipsEl.addEventListener("click", (e) => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    cat = b.dataset.c;
+    $$(".chip", chipsEl).forEach((x) => x.setAttribute("aria-pressed", x === b));
+    render();
+  });
+  searchEl.addEventListener("input", render);
+  render();
+}
+
+function buildReference() {
+  setupFilterTable({
+    data: BUILTINS, chipsEl: $("#biChips"), searchEl: $("#biSearch"), countEl: $("#biCount"), tableEl: $("#biTable"),
+    catOf: (b) => b[2], textOf: (b) => b.join(" "),
+    head: "<tr><th>Função</th><th>O que faz</th><th>Exemplo</th></tr>",
+    rowHTML: (b) => `<tr><td><code>${esc(b[0])}</code><br><small class="count">${esc(b[1])}</small></td><td>${esc(b[3])}<br><small class="count">${esc(b[2])}</small></td><td class="ex"><code>${esc(b[4])}</code></td></tr>`,
+  });
+  const nomes = { str: "Texto (str)", list: "Lista (list)", dict: "Dicionário (dict)", set: "Conjunto (set)" };
+  setupFilterTable({
+    data: METODOS, chipsEl: $("#mtChips"), searchEl: $("#mtSearch"), countEl: $("#mtCount"), tableEl: $("#mtTable"),
+    catOf: (m) => m[0], catLabel: (c) => nomes[c] || c, textOf: (m) => m.join(" "),
+    head: "<tr><th>Método</th><th>O que faz</th><th>Exemplo</th></tr>",
+    rowHTML: (m) => `<tr><td><code>${esc(m[1])}</code><br><small class="count">${esc(m[2])}</small></td><td>${esc(m[3])}</td><td class="ex"><code>${esc(m[4])}</code></td></tr>`,
+  });
+}
+
+function buildRecipes() {
+  const cats = ["Todos", ...Array.from(new Set(RECEITAS.map((r) => r.cat)))];
+  const chips = $("#rcChips"), list = $("#rcList");
+  chips.innerHTML = cats.map((c, i) => `<button type="button" class="chip" aria-pressed="${i === 0}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
+  list.innerHTML = RECEITAS.map((r, i) =>
+    `<article data-cat="${esc(r.cat)}"><h3>${esc(r.t)} <span class="tag">${esc(r.cat)}</span></h3><p>${esc(r.d)}</p><pre class="code" id="rc${i}"></pre></article>`).join("");
+  RECEITAS.forEach((r, i) => {
+    const pre = $("#rc" + i);
+    pre.textContent = r.c;
+    if (r.stdin) pre.dataset.stdin = r.stdin;
+    enhanceCode(pre);
+  });
+  chips.addEventListener("click", (e) => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    $$(".chip", chips).forEach((x) => x.setAttribute("aria-pressed", x === b));
+    $$("article", list).forEach((a) => (a.hidden = b.dataset.c !== "Todos" && a.dataset.cat !== b.dataset.c));
+  });
+}
+
+// ---------- exercícios ----------
+let done = new Set(store.get("done", []));
+let exFilter = "Todos";
+const LV = { 1: ["lv1", "fácil"], 2: ["lv2", "médio"], 3: ["lv3", "desafio"] };
+
+function updateProgress() {
+  const total = EXERCICIOS.length, n = EXERCICIOS.filter((e) => done.has(e.id)).length;
+  $("#progressText").textContent = n === 0 ? `Nenhum dos ${total} exercícios com correção resolvido ainda. Comece pelos fáceis!` : `${n} de ${total} exercícios resolvidos.`;
+  $("#progressBar").style.width = (n / total * 100) + "%";
+}
+function markDone(id) {
+  done.add(id);
+  store.set("done", Array.from(done));
+  renderExList();
+}
+
+function buildExercises() {
+  const caps = ["Todos", "Pendentes", ...Array.from(new Set(EXERCICIOS.map((e) => e.cap)))];
+  const chips = $("#exChips");
+  chips.innerHTML = caps.map((c) => `<button type="button" class="chip" aria-pressed="${c === exFilter}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
+  chips.addEventListener("click", (e) => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    exFilter = b.dataset.c;
+    $$(".chip", chips).forEach((x) => x.setAttribute("aria-pressed", x === b));
+    renderExList();
+  });
+  $("#exList").addEventListener("click", (e) => {
+    const c = e.target.closest(".excard"); if (c) location.hash = "ex-" + c.dataset.id;
+  });
+  renderExList();
+}
+function renderExList() {
+  const items = EXERCICIOS.filter((e) => exFilter === "Todos" || (exFilter === "Pendentes" ? !done.has(e.id) : e.cap === exFilter));
+  $("#exCount").textContent = `${items.length} exercícios · ${EXERCICIOS.filter((e) => done.has(e.id)).length} resolvidos no total`;
+  $("#exList").innerHTML = items.map((e) => `
+    <button type="button" class="excard" data-id="${e.id}">
+      <span class="top"><span class="tag">${e.n === "extra" ? "extra" : "nº " + esc(e.n)}</span><span class="tag ${LV[e.lv][0]}">${LV[e.lv][1]}</span>${done.has(e.id) ? '<span class="tag done">✓ resolvido</span>' : ""}</span>
+      <b>${esc(e.t)}</b><small>${esc(e.cap)}</small>
+    </button>`).join("");
+}
+
+function showExercise(id) {
+  const ex = EXERCICIOS.find((e) => e.id === id);
+  $("#exIndex").hidden = !!ex;
+  const det = $("#exDetail");
+  det.hidden = !ex;
+  if (!ex) { det.innerHTML = ""; return; }
+  const i = EXERCICIOS.indexOf(ex);
+  const prev = EXERCICIOS[i - 1], next = EXERCICIOS[i + 1];
+  const draft = store.get("draft:" + ex.id, ex.ini);
+  const hasIn = !!(ex.io || ex.stdin);
+  det.innerHTML = `
+    <div class="exhead"><a href="#exercicios">← Todos os exercícios</a><span>${prev ? `<a href="#ex-${prev.id}">anterior</a>` : ""}${prev && next ? " · " : ""}${next ? `<a href="#ex-${next.id}">próximo</a>` : ""}</span></div>
+    <div class="eyebrow" style="margin-top:18px">${esc(ex.cap)} · ${ex.n === "extra" ? "extra" : "exercício nº " + esc(ex.n)}</div>
+    <h1>${esc(ex.t)} <span class="tag ${LV[ex.lv][0]}" style="vertical-align:middle">${LV[ex.lv][1]}</span></h1>
+    <div class="statement">${ex.enun}${ex.io ? "<p><small>A correção roda seu programa com várias entradas e confere se a saída contém o resultado esperado.</small></p>" : "<p><small>Sua função precisa <b>retornar</b> o resultado (não basta mostrar com print).</small></p>"}</div>
+    <div class="codebox"><div class="bar"><span class="lbl">sua solução</span><button type="button" id="exReset">Restaurar início</button></div>
+    <textarea class="editor" id="exCode" spellcheck="false" aria-label="Seu código" style="min-height:260px"></textarea></div>
+    ${hasIn ? `<label class="small" for="exIn">Entrada para o botão Rodar (uma linha por input)</label><textarea class="stdin" id="exIn" spellcheck="false"></textarea>` : ""}
+    <div class="btnrow"><button class="btn" type="button" id="exRun">▶ Rodar</button><button class="btn go" type="button" id="exCheck">✓ Verificar</button></div>
+    <div id="exBanner"></div>
+    <div class="codebox" id="exOutBox" hidden><div class="bar"><span class="lbl">saída</span></div><div class="out" id="exOut" aria-live="polite"></div></div>
+    <ul class="results" id="exResults"></ul>
+    <details class="reveal"><summary>Dica</summary><div><p>${esc(ex.dica)}</p></div></details>
+    <details class="reveal" id="exSolBox"><summary>Ver uma solução</summary><div><p><small>Tente antes de abrir. Existem várias soluções certas; esta é só uma delas.</small></p><pre class="code" id="exSol"></pre></div></details>`;
+  const ta = $("#exCode");
+  ta.value = draft;
+  ta.addEventListener("input", () => store.set("draft:" + ex.id, ta.value));
+  if (hasIn) $("#exIn").value = ex.stdin || (ex.io ? ex.io[0][0] : "");
+  const sol = $("#exSol");
+  sol.textContent = ex.sol;
+  enhanceCode(sol);
+  setupEditor(ta, () => runEx(ex));
+  $("#exReset").addEventListener("click", () => { ta.value = ex.ini; store.set("draft:" + ex.id, ex.ini); });
+  $("#exRun").addEventListener("click", () => runEx(ex));
+  $("#exCheck").addEventListener("click", () => checkEx(ex));
+}
+
+async function runEx(ex) {
+  const box = $("#exOutBox"), out = $("#exOut");
+  box.hidden = false;
+  out.innerHTML = '<span class="muted">rodando…</span>';
+  const stdin = $("#exIn") ? $("#exIn").value : "";
+  try { out.innerHTML = outputHTML(await runPy($("#exCode").value, stdin)); }
+  catch (e) { out.innerHTML = FAIL_HTML; }
+}
+
+const norm = (s) => String(s).toLowerCase().replace(/\s+/g, "");
+async function checkEx(ex) {
+  const code = $("#exCode").value, list = $("#exResults"), banner = $("#exBanner"), btn = $("#exCheck");
+  list.innerHTML = ""; banner.innerHTML = ""; $("#exOutBox").hidden = true;
+  btn.disabled = true;
+  let passed = 0, total = 0;
+  try {
+    if (ex.io) {
+      total = ex.io.length;
+      for (const [stdin, toks] of ex.io) {
+        const res = await runPy(code, stdin);
+        const ok = res.ok && toks.every((t) => norm(res.prints).includes(norm(t)));
+        if (ok) passed++;
+        const entrada = stdin.split("\n").join(" · ");
+        const detalhe = res.ok ? `saída: ${res.prints.trim().slice(0, 160) || "(vazia)"}` : `${res.tipo}: ${res.erro}`;
+        list.insertAdjacentHTML("beforeend", `<li class="${ok ? "pass" : "fail"}">${ok ? "✓" : "✗"} entrada ${esc(entrada)} → esperado conter ${esc(toks.join(", "))}${ok ? "" : "<br>" + esc(detalhe)}</li>`);
+      }
+    } else {
+      const tests = ex.testes.map(([c, e]) => c + "\x01" + e).join("\x02");
+      const res = await runPy(code, "", tests);
+      total = ex.testes.length;
+      if (!res.ok) {
+        $("#exOutBox").hidden = false;
+        $("#exOut").innerHTML = outputHTML(res);
+      } else {
+        res.testes.forEach((t) => {
+          if (t.passou) passed++;
+          const call = t.codigo.split("\n").join("; ");
+          const got = t.erro ? t.erro : t.obtido;
+          list.insertAdjacentHTML("beforeend", `<li class="${t.passou ? "pass" : "fail"}">${t.passou ? "✓" : "✗"} ${esc(call)} → esperado ${esc(t.esperado)}${t.passou ? "" : ", veio " + esc(got)}</li>`);
+        });
+        if (res.testes.some((t) => !t.passou && t.obtido === "None")) {
+          list.insertAdjacentHTML("beforeend", `<li class="fail">Veio None: a função terminou sem return. Use return para devolver o resultado.</li>`);
+        }
+      }
+    }
+  } catch (e) {
+    $("#exOutBox").hidden = false;
+    $("#exOut").innerHTML = FAIL_HTML;
+    btn.disabled = false;
+    return;
+  }
+  btn.disabled = false;
+  if (passed === total) {
+    banner.innerHTML = `<div class="banner ok">Todos os ${total} testes passaram. Exercício resolvido!</div>`;
+    markDone(ex.id);
+  } else {
+    banner.innerHTML = `<div class="banner bad">${passed} de ${total} testes passaram. Veja os casos que falharam abaixo.</div>`;
+  }
+}
+
+// ---------- playground ----------
+function openPlayground(code, stdin) {
+  store.set("pg:code", code);
+  $("#pgCode").value = code;
+  $("#pgIn").value = stdin || "";
+  location.hash = "playground";
+  setTimeout(() => { const ta = $("#pgCode"); ta.focus(); ta.selectionStart = ta.selectionEnd = ta.value.length; }, 50);
+}
+function buildPlayground() {
+  const ta = $("#pgCode");
+  ta.value = store.get("pg:code", "# Escreva seu código aqui e clique em Rodar\nnome = input(\"Qual o seu nome? \")\nprint(f\"Olá, {nome}! Bem-vindo ao Python.\")\n\nfor i in range(1, 4):\n    print(\"Contando:\", i)\n");
+  $("#pgIn").value = "Maria";
+  ta.addEventListener("input", () => store.set("pg:code", ta.value));
+  const run = async () => {
+    $("#pgOutBox").hidden = false;
+    $("#pgOut").innerHTML = '<span class="muted">rodando…</span>';
+    try { $("#pgOut").innerHTML = outputHTML(await runPy(ta.value, $("#pgIn").value)); }
+    catch (e) { $("#pgOut").innerHTML = FAIL_HTML; }
+  };
+  setupEditor(ta, run);
+  $("#pgRun").addEventListener("click", run);
+  $("#pgClear").addEventListener("click", () => { ta.value = ""; store.set("pg:code", ""); $("#pgOutBox").hidden = true; ta.focus(); });
+}
+
+// ---------- teste de mesa 27 ----------
+function buildMesa() {
+  const casos = [[3, 2], [150, 3], [7, -1], [-2, 5], [50, 3]];
+  const t = $("#mesa27");
+  casos.forEach(([x, y], k) => {
+    t.insertAdjacentHTML("beforeend", `<tr><td>${x}</td><td>${y}</td><td><input id="m27z${k}" inputmode="numeric" aria-label="Z para X=${x}, Y=${y}"></td><td><input id="m27r${k}" maxlength="1" aria-label="Resposta para X=${x}, Y=${y}"></td></tr>`);
+  });
+  $("#mesa27btn").addEventListener("click", () => {
+    let certos = 0;
+    casos.forEach(([x, y], k) => {
+      const z = x * y + 5, r = z <= 0 ? "A" : z <= 100 ? "B" : "C";
+      const iz = $("#m27z" + k), ir = $("#m27r" + k);
+      const okz = Number(iz.value.trim()) === z && iz.value.trim() !== "";
+      const okr = ir.value.trim().toUpperCase() === r;
+      iz.className = okz ? "right" : "wrong"; ir.className = okr ? "right" : "wrong";
+      certos += okz + okr;
+    });
+    $("#mesa27msg").textContent = certos === 10 ? "Tudo certo!" : `${certos} de 10 corretos. Refaça as contas dos campos vermelhos.`;
+  });
+}
+
+// ---------- tema e menu ----------
+function setupChrome() {
+  const saved = store.get("theme", null);
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+  $("#themeBtn").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const nxt = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", nxt);
+    store.set("theme", nxt);
+  });
+  $("#menuBtn").addEventListener("click", () => {
+    const open = document.body.classList.toggle("nav-open");
+    $("#menuBtn").setAttribute("aria-expanded", String(open));
+  });
+}
+
+// ---------- início ----------
+buildNav();
+$$("main pre.code").forEach(enhanceCode);
+buildReference();
+buildRecipes();
+buildExercises();
+buildPlayground();
+buildMesa();
+setupChrome();
+updateProgress();
+window.addEventListener("hashchange", route);
+route();
+
+</script>
+</body>
+</html>
