@@ -1470,7 +1470,7 @@ for f in equipe:
 <script type="text/python" id="pyharness">
 from browser import window
 import sys
-import json
+
 import builtins
 
 
@@ -1576,7 +1576,37 @@ def _rodar(codigo, entrada, testes):
         sys.stdout, sys.stderr, builtins.input = velho_out, velho_err, velho_input
     res["tela"] = "".join(saida.tela)
     res["prints"] = "".join(saida.prints)
-    return json.dumps(res)
+    return _json(res)
+
+
+# Conversor próprio: o json do Brython 3.12 falha com o texto "5" ("Circular reference detected").
+def _json(o):
+    if o is None:
+        return "null"
+    if o is True:
+        return "true"
+    if o is False:
+        return "false"
+    if isinstance(o, (int, float)):
+        return str(o)
+    if isinstance(o, str):
+        partes = []
+        for ch in o:
+            c = ord(ch)
+            if ch == '"':
+                partes.append('\\"')
+            elif ch == "\\":
+                partes.append("\\\\")
+            elif c < 32:
+                partes.append("\\u" + hex(c)[2:].rjust(4, "0"))
+            else:
+                partes.append(ch)
+        return '"' + "".join(partes) + '"'
+    if isinstance(o, (list, tuple)):
+        return "[" + ",".join(_json(x) for x in o) + "]"
+    if isinstance(o, dict):
+        return "{" + ",".join(_json(str(k)) + ":" + _json(v) for k, v in o.items()) + "}"
+    return _json(str(o))
 
 
 window.pyRun = _rodar
