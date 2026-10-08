@@ -203,6 +203,25 @@ details.reveal summary { cursor: pointer; padding: 9px 14px; font-weight: 700; }
 details.reveal > div { padding: 0 14px 12px; }
 details.reveal .codebox { margin-top: 4px; }
 
+/* ---------- exercícios por capítulo, com enunciado ---------- */
+#exList { display: block; }
+.caphead { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-bottom: 8px; border-bottom: 2px solid var(--ink); }
+.exrows { display: grid; }
+.exrow { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 6px 14px; padding: 16px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.exrow-num { font: 800 1.15rem var(--f-display); color: var(--accent); padding-top: 2px; }
+.exrow h3 { margin: 0; font-size: 1.08rem; }
+.exrow .top { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 2px; }
+.exrow-enun { color: var(--ink); font-size: .96rem; }
+.exrow-enun p { margin: .45rem 0; max-width: 70ch; }
+.exrow-enun pre.code { border-radius: 8px; font-size: .8rem; max-height: 16em; overflow: auto; }
+.exrow-go { padding-top: 2px; }
+.exrow-go .btn { text-decoration: none; display: inline-block; white-space: nowrap; }
+.exrow.is-done .exrow-num { color: var(--ok); }
+@media (max-width: 640px) {
+  .exrow { grid-template-columns: 2.6em minmax(0, 1fr); }
+  .exrow-go { grid-column: 2; }
+}
+
 /* ---------- lista ETEC ---------- */
 .etec-item { display: grid; grid-template-columns: 3.2em minmax(0, 1fr) auto; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); align-items: start; }
 .etec-item .num { font: 700 .95rem var(--f-mono); color: var(--accent); padding-top: 1px; }
@@ -1435,6 +1454,7 @@ for f in equipe:
     <div class="note tip">
       <p><b>Método para resolver:</b> 1) leia o enunciado e os exemplos; 2) resolva um caso no papel; 3) escreva os passos em português como comentário; 4) traduza para Python; 5) clique em <b>Rodar</b> para ver o que acontece e em <b>Verificar</b> quando achar que está certo. Travou? Use a dica antes de olhar a solução.</p>
     </div>
+    <input class="search" id="exSearch" type="search" placeholder="Buscar por número ou palavra: 136, salário, vetor, primo…" aria-label="Buscar exercício">
     <div class="chips" id="exChips"></div>
     <p class="count" id="exCount"></p>
     <div class="exlist" id="exList"></div>
@@ -3828,6 +3848,7 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem("cadpy:" + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem("cadpy:" + k, JSON.stringify(v)); } catch (e) { /* armazenamento indisponível */ } },
 };
+function slug(c) { return String(c).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 // ---------- páginas ----------
@@ -4058,6 +4079,11 @@ function buildNav() {
     }
     html += `<a class="nav" href="#${p.id}" data-page="${p.id}"><span class="n">${p.n ? String(p.n).padStart(2, "0") : "·"}</span><span>${esc(p.t)}</span></a>`;
   });
+  html += `</div><div class="navgroup"><h4>Exercícios por capítulo</h4>`;
+  CAPS.forEach((c) => {
+    const n = EXERCICIOS.filter((e) => e.cap === c).length;
+    if (n) html += `<a class="nav" href="#cap-${slug(c)}" data-page="cap-${slug(c)}"><span class="n">${n}</span><span>${esc(c)}</span></a>`;
+  });
   nav.innerHTML = html + "</div>";
   $("#trail").innerHTML = PAGES.filter((p) => p.n).map((p) =>
     `<a href="#${p.id}"><span class="n">${p.n}</span><b>${esc(p.t)}</b><small>${esc(p.d)}</small></a>`).join("");
@@ -4066,10 +4092,17 @@ function buildNav() {
 function route() {
   let hash = decodeURIComponent(location.hash.slice(1)) || "inicio";
   let exId = null;
+  let navAtivo = null;
   if (hash.startsWith("ex-")) { exId = hash.slice(3); hash = "exercicios"; }
+  if (hash.startsWith("cap-")) {
+    const cap = CAPS.find((c) => "cap-" + slug(c) === hash);
+    if (cap) setExFilter(cap);
+    navAtivo = hash;
+    hash = "exercicios";
+  } else if (hash === "exercicios") setExFilter("Todos");
   if (!$("#p-" + hash)) hash = "inicio";
   $$(".page").forEach((s) => (s.hidden = s.id !== "p-" + hash));
-  $$(".sidebar a.nav").forEach((a) => a.classList.toggle("active", a.dataset.page === hash));
+  $$(".sidebar a.nav").forEach((a) => a.classList.toggle("active", a.dataset.page === (navAtivo || hash)));
   document.body.classList.remove("nav-open");
   $("#menuBtn").setAttribute("aria-expanded", "false");
   if (hash === "exercicios") showExercise(exId);
@@ -4176,19 +4209,47 @@ function buildExercises() {
     $$(".chip", chips).forEach((x) => x.setAttribute("aria-pressed", x === b));
     renderExList();
   });
-  $("#exList").addEventListener("click", (e) => {
-    const c = e.target.closest(".excard"); if (c) location.hash = "ex-" + c.dataset.id;
-  });
+  $("#exSearch").addEventListener("input", renderExList);
   renderExList();
 }
+function setExFilter(c) {
+  exFilter = c;
+  $$("#exChips .chip").forEach((x) => x.setAttribute("aria-pressed", x.dataset.c === c));
+  renderExList();
+}
+function textoPuro(html) {
+  const d = document.createElement("div");
+  d.innerHTML = html;
+  return d.textContent;
+}
 function renderExList() {
-  const items = EXERCICIOS.filter((e) => exFilter === "Todos" || (exFilter === "Pendentes" ? !done.has(e.id) : e.cap === exFilter));
-  $("#exCount").textContent = `${items.length} exercícios · ${EXERCICIOS.filter((e) => done.has(e.id)).length} resolvidos no total`;
-  $("#exList").innerHTML = items.map((e) => `
-    <button type="button" class="excard" data-id="${e.id}">
-      <span class="top"><span class="tag">${e.n === "extra" ? "extra" : "nº " + esc(e.n)}</span><span class="tag ${LV[e.lv][0]}">${LV[e.lv][1]}</span>${e.tipo === "quiz" ? '<span class="tag">perguntas</span>' : e.tipo === "livre" ? '<span class="tag">resposta escrita</span>' : ""}${done.has(e.id) ? '<span class="tag done">✓ resolvido</span>' : ""}</span>
-      <b>${esc(e.t)}</b><small>${esc(e.cap)}</small>
-    </button>`).join("");
+  const q = $("#exSearch").value.trim().toLowerCase();
+  const items = EXERCICIOS.filter((e) =>
+    (exFilter === "Todos" || (exFilter === "Pendentes" ? !done.has(e.id) : e.cap === exFilter)) &&
+    (!q || String(e.n).toLowerCase() === q || (e.t + " " + textoPuro(e.enun)).toLowerCase().includes(q)));
+  $("#exCount").textContent = `${items.length} exercícios · ${EXERCICIOS.filter((e) => done.has(e.id)).length} de ${EXERCICIOS.length} resolvidos no total`;
+  let html = "", cur = null;
+  items.forEach((e) => {
+    if (e.cap !== cur) {
+      if (cur !== null) html += "</div>";
+      cur = e.cap;
+      const doCap = EXERCICIOS.filter((x) => x.cap === cur);
+      html += `<h2 class="caphead">${esc(cur)} <span class="count">${doCap.filter((x) => done.has(x.id)).length} de ${doCap.length} resolvidos</span></h2><div class="exrows">`;
+    }
+    const tipo = e.tipo === "quiz" ? "perguntas" : e.tipo === "livre" ? "resposta escrita" : e.io ? "programa" : "função";
+    html += `
+      <article class="exrow${done.has(e.id) ? " is-done" : ""}">
+        <div class="exrow-num">${e.n === "extra" ? "extra" : esc(e.n)}</div>
+        <div class="exrow-body">
+          <h3>${esc(e.t)}</h3>
+          <div class="top"><span class="tag ${LV[e.lv][0]}">${LV[e.lv][1]}</span><span class="tag">${tipo}</span>${done.has(e.id) ? '<span class="tag done">✓ resolvido</span>' : ""}</div>
+          <div class="exrow-enun">${e.enun}</div>
+        </div>
+        <div class="exrow-go"><a class="btn ${done.has(e.id) ? "" : "go"}" href="#ex-${e.id}">${done.has(e.id) ? "Revisar" : "Resolver"}</a></div>
+      </article>`;
+  });
+  if (cur !== null) html += "</div>";
+  $("#exList").innerHTML = html || "<p>Nenhum exercício encontrado.</p>";
 }
 
 function showExercise(id) {
@@ -4203,7 +4264,7 @@ function showExercise(id) {
   const draft = store.get("draft:" + ex.id, ex.ini);
   const hasIn = !!(ex.io || ex.stdin);
   det.innerHTML = `
-    <div class="exhead"><a href="#exercicios">← Todos os exercícios</a><span>${prev ? `<a href="#ex-${prev.id}">anterior</a>` : ""}${prev && next ? " · " : ""}${next ? `<a href="#ex-${next.id}">próximo</a>` : ""}</span></div>
+    <div class="exhead"><a href="#cap-${slug(ex.cap)}">← Exercícios de ${esc(ex.cap)}</a><span>${prev ? `<a href="#ex-${prev.id}">anterior</a>` : ""}${prev && next ? " · " : ""}${next ? `<a href="#ex-${next.id}">próximo</a>` : ""}</span></div>
     <div class="eyebrow" style="margin-top:18px">${esc(ex.cap)} · ${ex.n === "extra" ? "extra" : "exercício nº " + esc(ex.n)}</div>
     <h1>${esc(ex.t)} <span class="tag ${LV[ex.lv][0]}" style="vertical-align:middle">${LV[ex.lv][1]}</span></h1>
     <div class="statement">${ex.enun}${ex.io ? "<p><small>A correção roda seu programa com várias entradas e confere se a saída contém o resultado esperado.</small></p>" : "<p><small>Sua função precisa <b>retornar</b> o resultado (não basta mostrar com print).</small></p>"}</div>
@@ -4254,7 +4315,7 @@ function quizOk(q, ans) {
 function showTextExercise(ex, prev, next) {
   const det = $("#exDetail");
   const head = `
-    <div class="exhead"><a href="#exercicios">← Todos os exercícios</a><span>${prev ? `<a href="#ex-${prev.id}">anterior</a>` : ""}${prev && next ? " · " : ""}${next ? `<a href="#ex-${next.id}">próximo</a>` : ""}</span></div>
+    <div class="exhead"><a href="#cap-${slug(ex.cap)}">← Exercícios de ${esc(ex.cap)}</a><span>${prev ? `<a href="#ex-${prev.id}">anterior</a>` : ""}${prev && next ? " · " : ""}${next ? `<a href="#ex-${next.id}">próximo</a>` : ""}</span></div>
     <div class="eyebrow" style="margin-top:18px">${esc(ex.cap)} · ${ex.n === "extra" ? "extra" : "exercício nº " + esc(ex.n)}</div>
     <h1>${esc(ex.t)} <span class="tag ${LV[ex.lv][0]}" style="vertical-align:middle">${LV[ex.lv][1]}</span></h1>
     <div class="statement">${ex.enun}</div>`;
