@@ -2427,7 +2427,25 @@ function waitPy(timeout = 45000) {
     })();
   });
 }
+// O Brython lança TypeError em float("texto"); o Python de verdade lança ValueError.
+function fixBrythonFloat() {
+  const B = window.__BRYTHON__ && window.__BRYTHON__.builtins;
+  if (!B || !B.float || B.float.__corrigido) return;
+  const fix = (fn) => function (...args) {
+    try { return fn.apply(this, args); }
+    catch (e) {
+      if (e && e.__class__ === B.TypeError && /could not convert string to float/.test(String(e.args && e.args[0]))) {
+        throw B.ValueError.$factory(e.args[0]);
+      }
+      throw e;
+    }
+  };
+  B.float.$factory = fix(B.float.$factory);
+  B.float.__new__ = fix(B.float.__new__);
+  B.float.__corrigido = true;
+}
 waitPy().then(() => {
+  try { fixBrythonFloat(); } catch (e) { /* segue sem a correção */ }
   statusEl.textContent = "Python pronto";
   statusEl.className = "pystatus ok";
 }).catch(() => {
